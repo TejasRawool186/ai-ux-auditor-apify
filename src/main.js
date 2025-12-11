@@ -313,11 +313,7 @@ await Actor.main(async () => {
         maxConcurrency = 5
     } = input;
 
-    // Debug logging to see what values we're getting
-    console.log(`🔍 DEBUG - Input values:`);
-    console.log(`  - useFreeMode: ${useFreeMode}`);
-    console.log(`  - apiKey provided: ${!!apiKey}`);
-    console.log(`  - startUrls count: ${startUrls.length}`);
+    // Input validation completed
 
     // Validate inputs
     if (!startUrls || startUrls.length === 0) {
