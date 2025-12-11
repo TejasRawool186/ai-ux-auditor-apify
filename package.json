@@ -6,7 +6,9 @@
     "main": "src/main.js",
     "scripts": {
         "start": "node src/main.js",
-        "test": "echo \"No tests specified\" && exit 0"
+        "test": "node test-local.js",
+        "build": "node verify-build.js",
+        "verify": "node verify-build.js"
     },
     "author": "Tejas Rawool",
     "license": "MIT",

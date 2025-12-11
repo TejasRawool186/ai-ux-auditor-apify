@@ -12,4 +12,4 @@ storage/
 *.log
 coverage/
 .nyc_output/
-package-lock.json
+# package-lock.json

@@ -190,6 +190,37 @@ Your audit will include:
 
 ---
 
+## 🔧 Local Development & Testing
+
+### Prerequisites
+- Node.js 20+ 
+- npm or yarn
+
+### Setup
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd ai-ux-auditor
+
+# Install dependencies
+npm install
+
+# Test locally (uses default input)
+npm test
+
+# Run with custom input
+npm start
+```
+
+### Docker Build
+```bash
+# Build the Docker image
+docker build -t ai-ux-auditor .
+
+# Run the container
+docker run ai-ux-auditor
+```
+
 ## 🛠️ Advanced Features
 
 ### Proxy Support

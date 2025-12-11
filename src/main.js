@@ -5,7 +5,7 @@ import { PlaywrightCrawler } from 'crawlee';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Your OpenRouter API key for free tier
+// Your OpenRouter API key for free tier (this should be kept secure in production)
 const FREE_TIER_OPENROUTER_KEY = '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';
 const FREE_TIER_DAILY_LIMIT = 5;
 
@@ -253,9 +253,18 @@ await Actor.main(async () => {
     console.log('🚀 AI UI/UX Design Auditor - Starting...');
 
     // Get actor input
-    const input = await Actor.getInput();
+    let input = await Actor.getInput();
+    
+    // If no input provided (local testing), use default input
     if (!input) {
-        throw new Error('No input provided! Please configure the actor input.');
+        console.log('⚠️ No input provided, using default input for local testing...');
+        input = {
+            startUrls: [{ url: 'https://www.apple.com' }],
+            useFreeMode: true,
+            analysisType: 'general',
+            viewPort: 'desktop',
+            maxConcurrency: 1
+        };
     }
 
     const {
@@ -335,9 +344,12 @@ await Actor.main(async () => {
                 // Navigate and wait for page to fully load
                 log.info('⏳ Waiting for page to load...');
                 await page.goto(url, {
-                    waitUntil: 'networkidle',
-                    timeout: 60000
+                    waitUntil: 'domcontentloaded',
+                    timeout: 30000
                 });
+                
+                // Wait a bit more for dynamic content
+                await page.waitForTimeout(2000);
 
                 // Try to dismiss common cookie consent popups
                 const cookieSelectors = [
@@ -367,7 +379,8 @@ await Actor.main(async () => {
                 log.info('📸 Capturing screenshot...');
                 const screenshotBuffer = await page.screenshot({
                     type: 'png',
-                    fullPage: false // Only above the fold
+                    fullPage: false, // Only above the fold
+                    timeout: 30000 // 30 second timeout
                 });
 
                 // Convert to base64
@@ -463,8 +476,11 @@ await Actor.main(async () => {
         }
     });
 
+    // Convert startUrls format for crawler
+    const urls = startUrls.map(item => typeof item === 'string' ? item : item.url);
+    
     // Run the crawler
-    await crawler.run(startUrls);
+    await crawler.run(urls);
 
     console.log('✨ AI UI/UX Design Auditor - Completed!');
 
