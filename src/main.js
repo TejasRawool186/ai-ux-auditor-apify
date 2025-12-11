@@ -250,7 +250,7 @@ async function analyzeWithGemini(client, screenshotBase64, analysisType, url) {
     const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.general;
 
     const model = client.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-1.5-pro',
         generationConfig: {
             responseMimeType: 'application/json'
         }
