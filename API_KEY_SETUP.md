@@ -26,7 +26,10 @@ The actor now requires you to provide your own API key for AI analysis. This ens
 3. Click "Create API Key"
 4. Copy the key (starts with `AIza...`)
 5. Paste into the "API Key" field
-6. **Cost**: FREE with generous daily limits
+6. **Cost**: FREE with generous limits
+   - **Models Available**: Gemini 2.0 Flash, Gemini 1.5 Flash, Gemini 1.5 Pro
+   - **Free Quota**: Up to 1,500 requests per day
+   - **Rate Limits**: 1 million tokens per minute
 
 ### Option 2: OpenAI GPT-4 Vision
 1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)

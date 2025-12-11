@@ -249,12 +249,37 @@ function getDemoAnalysis(analysisType, url) {
 async function analyzeWithGemini(client, screenshotBase64, analysisType, url) {
     const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.general;
 
-    const model = client.getGenerativeModel({
-        model: 'gemini-1.5-pro',
-        generationConfig: {
-            responseMimeType: 'application/json'
+    // Try models in order of preference (newest to oldest)
+    const modelNames = [
+        'gemini-2.0-flash-exp',      // Latest experimental
+        'gemini-1.5-flash',          // Stable and fast
+        'gemini-1.5-pro',            // More capable
+        'gemini-pro-vision',         // Legacy vision model
+        'gemini-pro'                 // Fallback
+    ];
+
+    let model;
+    let modelUsed;
+
+    for (const modelName of modelNames) {
+        try {
+            model = client.getGenerativeModel({
+                model: modelName,
+                generationConfig: {
+                    responseMimeType: 'application/json'
+                }
+            });
+            modelUsed = modelName;
+            console.log(`🤖 Using Gemini model: ${modelName}`);
+            break;
+        } catch (error) {
+            console.log(`⚠️ Model ${modelName} not available, trying next...`);
         }
-    });
+    }
+
+    if (!model) {
+        throw new Error('No available Gemini models found. Please check your API key and try again.');
+    }
 
     const fullPrompt = `${prompt}
 
