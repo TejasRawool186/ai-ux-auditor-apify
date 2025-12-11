@@ -1,0 +1,11 @@
+{
+    "startUrls": [
+        {
+            "url": "https://www.apple.com"
+        }
+    ],
+    "useFreeMode": true,
+    "analysisType": "general",
+    "viewPort": "desktop",
+    "maxConcurrency": 1
+}

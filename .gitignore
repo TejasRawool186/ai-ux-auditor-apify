@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+
+# Apify storage
+apify_storage/
+storage/
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Added by Apify CLI
+storage
+node_modules
+.venv

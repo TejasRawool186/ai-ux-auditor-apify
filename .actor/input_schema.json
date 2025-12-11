@@ -1,0 +1,95 @@
+{
+    "title": "AI UI/UX Design Auditor Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Website URLs to Audit",
+            "type": "array",
+            "description": "List of website URLs you want to analyze for UI/UX quality",
+            "editor": "requestListSources",
+            "prefill": [
+                {
+                    "url": "https://www.apple.com"
+                }
+            ]
+        },
+        "useFreeMode": {
+            "title": "Use Free Tier",
+            "type": "boolean",
+            "description": "Enable this to use the free tier (5 audits per day). Disable to use your own API key for unlimited audits.",
+            "default": true,
+            "editor": "checkbox"
+        },
+        "apiKey": {
+            "title": "Your API Key (Optional)",
+            "type": "string",
+            "description": "Provide your own OpenAI (sk-...) or Google Gemini (AIza...) API key for unlimited audits. Leave empty to use free tier.",
+            "editor": "textfield",
+            "isSecret": true,
+            "nullable": true
+        },
+        "analysisType": {
+            "title": "Analysis Type",
+            "type": "string",
+            "description": "Choose the type of UI/UX analysis you want to perform",
+            "enum": [
+                "general",
+                "accessibility",
+                "conversion",
+                "performance",
+                "seo",
+                "mobile-first",
+                "brand-consistency"
+            ],
+            "enumTitles": [
+                "General - Overall aesthetics and usability",
+                "Accessibility - WCAG compliance and inclusive design",
+                "Conversion - CRO and sales funnel optimization",
+                "Performance - Visual performance and load indicators",
+                "SEO - On-page SEO elements and content structure",
+                "Mobile-First - Mobile UX and responsive design",
+                "Brand Consistency - Color palette and typography"
+            ],
+            "default": "general",
+            "editor": "select"
+        },
+        "viewPort": {
+            "title": "Viewport / Device Type",
+            "type": "string",
+            "description": "Simulate desktop or mobile device for screenshot capture",
+            "enum": [
+                "desktop",
+                "mobile"
+            ],
+            "enumTitles": [
+                "Desktop (1920x1080)",
+                "Mobile (390x844 - iPhone 14)"
+            ],
+            "default": "desktop",
+            "editor": "select"
+        },
+        "proxyConfiguration": {
+            "title": "Proxy Configuration",
+            "type": "object",
+            "description": "Use Apify Proxy to avoid blocking and access geo-restricted content",
+            "editor": "proxy",
+            "prefill": {
+                "useApifyProxy": true
+            }
+        },
+        "maxConcurrency": {
+            "title": "Max Concurrency",
+            "type": "integer",
+            "description": "Maximum number of pages to analyze simultaneously (recommended: 3-5 to avoid API rate limits)",
+            "default": 5,
+            "minimum": 1,
+            "maximum": 10
+        }
+    },
+    "required": [
+        "startUrls",
+        "analysisType",
+        "viewPort"
+    ]
+}

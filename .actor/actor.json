@@ -1,0 +1,61 @@
+{
+  "actorSpecification": 1,
+  "name": "ai-ux-auditor",
+  "title": "AI UI/UX Design Auditor",
+  "description": "Automated UI/UX audits powered by AI Vision. Analyze websites for design quality, accessibility, conversion optimization, and more. Get professional UX insights in seconds!",
+  "version": "1.0",
+  "meta": {
+    "templateId": "crawlee-playwright-javascript"
+  },
+  "input": "./.actor/input_schema.json",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "categories": [
+    "TOOLS",
+    "AI",
+    "DEVELOPER_TOOLS"
+  ],
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "UX Audit Results",
+      "description": "AI-generated UI/UX audit reports with scores, recommendations, and color palette analysis",
+      "views": {
+        "overview": {
+          "title": "Audit Overview",
+          "transformation": {
+            "fields": [
+              "url",
+              "analysis_type",
+              "score",
+              "summary",
+              "ai_provider"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "url": {
+                "label": "Website URL",
+                "format": "link"
+              },
+              "analysis_type": {
+                "label": "Analysis Type"
+              },
+              "score": {
+                "label": "UX Score",
+                "format": "number"
+              },
+              "summary": {
+                "label": "Summary"
+              },
+              "ai_provider": {
+                "label": "AI Provider"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
