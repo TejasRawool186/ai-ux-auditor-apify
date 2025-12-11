@@ -99,7 +99,7 @@ function initializeAIProvider(apiKey) {
                     'X-Title': 'Apify UI/UX Auditor',
                 },
             }),
-            model: 'google/gemini-2.0-flash-exp:free'
+            model: 'openai/gpt-4o-mini' // More reliable and faster
         };
     } else if (apiKey.startsWith('sk-')) {
         console.log('🤖 Detected OpenAI API Key');
@@ -121,16 +121,23 @@ function initializeAIProvider(apiKey) {
 
 // Removed usage tracking - users provide their own API keys
 
-// Call OpenAI/OpenRouter API
+// Call OpenAI/OpenRouter API with retry logic
 async function analyzeWithOpenAI(client, screenshotBase64, analysisType, url, model = 'gpt-4o') {
     const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.general;
 
-    const response = await client.chat.completions.create({
-        model: model,
-        messages: [
-            {
-                role: 'system',
-                content: `${prompt}
+    const maxRetries = 3;
+    let lastError;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`🔄 API attempt ${attempt}/${maxRetries}`);
+
+            const response = await client.chat.completions.create({
+                model: model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: `${prompt}
 
 Output a strict JSON object with this exact structure:
 {
@@ -141,28 +148,46 @@ Output a strict JSON object with this exact structure:
   "positive_aspects": ["positive 1", "positive 2", ...],
   "recommendations": ["recommendation 1", "recommendation 2", ...]
 }`
-            },
-            {
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: `Analyze this ${analysisType} audit for: ${url}`
                     },
                     {
-                        type: 'image_url',
-                        image_url: {
-                            url: `data:image/png;base64,${screenshotBase64}`
-                        }
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Analyze this ${analysisType} audit for: ${url}`
+                            },
+                            {
+                                type: 'image_url',
+                                image_url: {
+                                    url: `data:image/png;base64,${screenshotBase64}`
+                                }
+                            }
+                        ]
                     }
-                ]
-            }
-        ],
-        response_format: { type: 'json_object' },
-        max_tokens: 1500
-    });
+                ],
+                response_format: { type: 'json_object' },
+                max_tokens: 1500
+            });
 
-    return JSON.parse(response.choices[0].message.content);
+            return JSON.parse(response.choices[0].message.content);
+
+        } catch (error) {
+            lastError = error;
+            console.log(`⚠️ Attempt ${attempt} failed: ${error.message}`);
+
+            // Check if it's a rate limit error
+            if (error.message?.includes('429') || error.message?.includes('rate limit')) {
+                const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
+                console.log(`⏳ Rate limit hit, waiting ${waitTime/1000}s before retry...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            } else {
+                // Non-rate-limit error, don't retry
+                throw error;
+            }
+        }
+    }
+
+    throw new Error(`API failed after ${maxRetries} attempts. Last error: ${lastError?.message}`);
 }
 
 // Removed demo analysis - users must provide API keys
@@ -361,7 +386,11 @@ await Actor.main(async () => {
 
                     // Check for specific error types
                     if (apiError.message?.includes('401') || apiError.message?.includes('authentication')) {
-                        throw new Error('Invalid API Key provided. Please check your OpenAI, OpenRouter, or Gemini API key.');
+                        throw new Error('Invalid API Key provided. Please check your API key.');
+                    } else if (apiError.message?.includes('429') || apiError.message?.includes('rate limit')) {
+                        throw new Error('Rate limit exceeded. Please try again in a few minutes or upgrade your API plan.');
+                    } else if (apiError.message?.includes('insufficient_quota') || apiError.message?.includes('quota')) {
+                        throw new Error('API quota exceeded. Please check your API account balance or upgrade your plan.');
                     }
 
                     throw new Error(`AI analysis failed: ${apiError.message}`);
