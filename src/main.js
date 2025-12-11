@@ -251,35 +251,10 @@ async function analyzeWithGemini(client, screenshotBase64, analysisType, url) {
 
     // Try models in order of preference (newest to oldest)
     const modelNames = [
-        'gemini-2.0-flash-exp',      // Latest experimental
-        'gemini-1.5-flash',          // Stable and fast
-        'gemini-1.5-pro',            // More capable
+        'gemini-1.5-pro',            // Most reliable for vision
         'gemini-pro-vision',         // Legacy vision model
-        'gemini-pro'                 // Fallback
+        'gemini-pro'                 // Basic fallback
     ];
-
-    let model;
-    let modelUsed;
-
-    for (const modelName of modelNames) {
-        try {
-            model = client.getGenerativeModel({
-                model: modelName,
-                generationConfig: {
-                    responseMimeType: 'application/json'
-                }
-            });
-            modelUsed = modelName;
-            console.log(`🤖 Using Gemini model: ${modelName}`);
-            break;
-        } catch (error) {
-            console.log(`⚠️ Model ${modelName} not available, trying next...`);
-        }
-    }
-
-    if (!model) {
-        throw new Error('No available Gemini models found. Please check your API key and try again.');
-    }
 
     const fullPrompt = `${prompt}
 
@@ -302,11 +277,35 @@ Output a strict JSON object with this exact structure:
         }
     };
 
-    const result = await model.generateContent([fullPrompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
+    let lastError;
 
-    return JSON.parse(text);
+    for (const modelName of modelNames) {
+        try {
+            console.log(`🤖 Trying Gemini model: ${modelName}`);
+            
+            const model = client.getGenerativeModel({
+                model: modelName,
+                generationConfig: {
+                    responseMimeType: 'application/json'
+                }
+            });
+
+            const result = await model.generateContent([fullPrompt, imagePart]);
+            const response = await result.response;
+            const text = response.text();
+
+            console.log(`✅ Successfully used model: ${modelName}`);
+            return JSON.parse(text);
+
+        } catch (error) {
+            lastError = error;
+            console.log(`⚠️ Model ${modelName} failed: ${error.message}`);
+            console.log(`🔄 Trying next model...`);
+        }
+    }
+
+    // If all models failed, throw the last error
+    throw new Error(`All Gemini models failed. Last error: ${lastError?.message}`);
 }
 
 // Main actor entry point
