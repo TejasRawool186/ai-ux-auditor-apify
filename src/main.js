@@ -5,8 +5,7 @@ import { PlaywrightCrawler } from 'crawlee';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Free tier configuration - users must provide their own API key
-const FREE_TIER_DAILY_LIMIT = 5;
+// AI UX Auditor - Users provide their own API keys
 
 // Analysis prompts for each audit type
 const ANALYSIS_PROMPTS = {
@@ -81,25 +80,10 @@ Evaluate mobile user experience.`,
 Extract color palette and evaluate brand design.`
 };
 
-// Initialize AI provider based on configuration
-function initializeAIProvider(apiKey, useFreeMode) {
-    // If free mode is enabled but no API key provided, show error
-    if (useFreeMode && !apiKey) {
-        throw new Error(`Free tier requires you to provide your own API key. Please:
-1. Get a free Gemini API key from https://aistudio.google.com/app/apikey
-2. Or get an OpenAI API key from https://platform.openai.com/api-keys
-3. Add it to the "API Key" field in the actor input
-4. Or disable "Use Free Tier" and the actor will show a demo error message`);
-    }
-
+// Initialize AI provider based on API key
+function initializeAIProvider(apiKey) {
     if (!apiKey) {
-        // No API key provided and free mode disabled - return demo mode
-        console.log('🎭 DEMO MODE: No API key provided. Will show sample analysis.');
-        return {
-            type: 'demo',
-            client: null,
-            model: 'demo'
-        };
+        throw new Error('API Key is required. Please provide your OpenAI, OpenRouter, or Gemini API key.');
     }
 
     // Auto-detect API provider based on key format
@@ -109,9 +93,13 @@ function initializeAIProvider(apiKey, useFreeMode) {
             type: 'openrouter',
             client: new OpenAI({
                 apiKey,
-                baseURL: 'https://openrouter.ai/api/v1'
+                baseURL: 'https://openrouter.ai/api/v1',
+                defaultHeaders: {
+                    'HTTP-Referer': 'https://apify.com/',
+                    'X-Title': 'Apify UI/UX Auditor',
+                },
             }),
-            model: 'google/gemini-2.0-flash-exp:free' // Default model for user keys too, or user could specify but we keep it simple
+            model: 'google/gemini-2.0-flash-exp:free'
         };
     } else if (apiKey.startsWith('sk-')) {
         console.log('🤖 Detected OpenAI API Key');
@@ -131,23 +119,7 @@ function initializeAIProvider(apiKey, useFreeMode) {
     }
 }
 
-// Track free tier usage (simple in-memory tracking per actor run)
-const usageTracker = {
-    count: 0,
-    limit: FREE_TIER_DAILY_LIMIT,
-
-    canProcess() {
-        return this.count < this.limit;
-    },
-
-    increment() {
-        this.count++;
-    },
-
-    getRemaining() {
-        return Math.max(0, this.limit - this.count);
-    }
-};
+// Removed usage tracking - users provide their own API keys
 
 // Call OpenAI/OpenRouter API
 async function analyzeWithOpenAI(client, screenshotBase64, analysisType, url, model = 'gpt-4o') {
@@ -193,68 +165,11 @@ Output a strict JSON object with this exact structure:
     return JSON.parse(response.choices[0].message.content);
 }
 
-// Demo analysis for when no API key is provided
-function getDemoAnalysis(analysisType, url) {
-    const demoResults = {
-        general: {
-            score: 7.5,
-            summary: "Demo analysis: This appears to be a well-structured website with good visual hierarchy. The layout is clean and professional.",
-            color_palette: ["#FFFFFF", "#000000", "#0066CC", "#F5F5F5", "#333333"],
-            design_flaws: [
-                "Demo: Some elements could benefit from better spacing",
-                "Demo: Color contrast could be improved in certain areas",
-                "Demo: Navigation could be more prominent"
-            ],
-            positive_aspects: [
-                "Demo: Clean and professional layout",
-                "Demo: Good use of whitespace",
-                "Demo: Consistent typography throughout"
-            ],
-            recommendations: [
-                "Demo: Consider adding more visual hierarchy",
-                "Demo: Improve color contrast for better accessibility",
-                "Demo: Add more prominent call-to-action buttons"
-            ]
-        },
-        accessibility: {
-            score: 6.8,
-            summary: "Demo accessibility analysis: The site has basic accessibility features but needs improvements in contrast and keyboard navigation.",
-            color_palette: ["#FFFFFF", "#000000", "#0066CC", "#F5F5F5"],
-            design_flaws: [
-                "Demo: Insufficient color contrast in some areas",
-                "Demo: Missing alt text for images",
-                "Demo: Keyboard navigation could be improved"
-            ],
-            positive_aspects: [
-                "Demo: Semantic HTML structure appears to be used",
-                "Demo: Text is generally readable",
-                "Demo: Basic heading structure is present"
-            ],
-            recommendations: [
-                "Demo: Increase color contrast to meet WCAG standards",
-                "Demo: Add descriptive alt text for all images",
-                "Demo: Implement better keyboard navigation"
-            ]
-        }
-    };
+// Removed demo analysis - users must provide API keys
 
-    const result = demoResults[analysisType] || demoResults.general;
-    return {
-        ...result,
-        demo_note: "This is a demo analysis. Provide your API key for real AI-powered insights."
-    };
-}
-
-// Call Google Gemini Vision API (Native)
+// Call Google Gemini Vision API (Native) - Simplified
 async function analyzeWithGemini(client, screenshotBase64, analysisType, url) {
     const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.general;
-
-    // Try models in order of preference (newest to oldest)
-    const modelNames = [
-        'gemini-1.5-pro',            // Most reliable for vision
-        'gemini-pro-vision',         // Legacy vision model
-        'gemini-pro'                 // Basic fallback
-    ];
 
     const fullPrompt = `${prompt}
 
@@ -277,35 +192,16 @@ Output a strict JSON object with this exact structure:
         }
     };
 
-    let lastError;
+    // Use the most reliable model
+    const model = client.getGenerativeModel({
+        model: 'gemini-1.5-flash-latest'
+    });
 
-    for (const modelName of modelNames) {
-        try {
-            console.log(`🤖 Trying Gemini model: ${modelName}`);
-            
-            const model = client.getGenerativeModel({
-                model: modelName,
-                generationConfig: {
-                    responseMimeType: 'application/json'
-                }
-            });
+    const result = await model.generateContent([fullPrompt, imagePart]);
+    const response = await result.response;
+    const text = response.text();
 
-            const result = await model.generateContent([fullPrompt, imagePart]);
-            const response = await result.response;
-            const text = response.text();
-
-            console.log(`✅ Successfully used model: ${modelName}`);
-            return JSON.parse(text);
-
-        } catch (error) {
-            lastError = error;
-            console.log(`⚠️ Model ${modelName} failed: ${error.message}`);
-            console.log(`🔄 Trying next model...`);
-        }
-    }
-
-    // If all models failed, throw the last error
-    throw new Error(`All Gemini models failed. Last error: ${lastError?.message}`);
+    return JSON.parse(text);
 }
 
 // Main actor entry point
@@ -315,21 +211,13 @@ await Actor.main(async () => {
     // Get actor input
     let input = await Actor.getInput();
     
-    // If no input provided (local testing), use default input
+    // If no input provided (local testing), throw error
     if (!input) {
-        console.log('⚠️ No input provided, using default input for local testing...');
-        input = {
-            startUrls: [{ url: 'https://www.apple.com' }],
-            useFreeMode: false, // Demo mode for local testing
-            analysisType: 'general',
-            viewPort: 'desktop',
-            maxConcurrency: 1
-        };
+        throw new Error('No input provided. Please configure the actor with your API key and URLs to analyze.');
     }
 
     const {
         startUrls = [],
-        useFreeMode = false, // Default to demo mode
         apiKey,
         analysisType = 'general',
         viewPort = 'desktop',
@@ -337,23 +225,22 @@ await Actor.main(async () => {
         maxConcurrency = 5
     } = input;
 
-    // Input validation completed
-
     // Validate inputs
     if (!startUrls || startUrls.length === 0) {
         throw new Error('No URLs provided. Please add at least one URL to analyze.');
     }
 
+    if (!apiKey) {
+        throw new Error('API Key is required. Please provide your OpenAI, OpenRouter, or Gemini API key.');
+    }
+
     // Initialize AI provider
     let aiProvider;
     try {
-        aiProvider = initializeAIProvider(apiKey, useFreeMode);
+        aiProvider = initializeAIProvider(apiKey);
     } catch (error) {
         throw new Error(`Failed to initialize AI provider: ${error.message}`);
     }
-
-    const isFreeMode = useFreeMode && apiKey; // Free mode when user provides their own key
-    const isDemoMode = aiProvider.type === 'demo';
 
     // Configure viewport dimensions
     const viewportConfig = viewPort === 'mobile'
@@ -363,12 +250,7 @@ await Actor.main(async () => {
     console.log(`📱 Viewport: ${viewPort} (${viewportConfig.width}x${viewportConfig.height})`);
     console.log(`🎯 Analysis Type: ${analysisType}`);
     console.log(`🤖 AI Provider: ${aiProvider.type.toUpperCase()}`);
-
-    if (isDemoMode) {
-        console.log(`🎭 DEMO MODE: Sample analysis will be provided. Add your API key for real AI insights!`);
-    } else if (isFreeMode) {
-        console.log(`🎁 FREE TIER MODE: Using your API key with generous free limits`);
-    }
+    console.log(`🔑 Using your API key for unlimited analysis`);
 
     // Initialize Playwright Crawler
     const crawler = new PlaywrightCrawler({
@@ -392,17 +274,7 @@ await Actor.main(async () => {
             const url = request.url;
             log.info(`🔍 Analyzing: ${url}`);
 
-            // Check free tier limit
-            if (isFreeMode && !usageTracker.canProcess()) {
-                log.warning(`⚠️ FREE TIER LIMIT REACHED (${FREE_TIER_DAILY_LIMIT} audits per day)`);
-                await Actor.pushData({
-                    url,
-                    status: 'LIMIT_REACHED',
-                    message: `Free tier limit reached (${FREE_TIER_DAILY_LIMIT} audits per day). Please provide your own API key for unlimited audits.`,
-                    audit_date: new Date().toISOString()
-                });
-                return;
-            }
+            // Process the URL
 
             try {
                 // Navigate and wait for page to fully load
@@ -465,31 +337,23 @@ await Actor.main(async () => {
                 let aiResult;
 
                 try {
-                    if (aiProvider.type === 'demo') {
-                        // Demo mode - return sample analysis
-                        log.info('🎭 Generating demo analysis...');
-                        aiResult = getDemoAnalysis(analysisType, url);
-                    } else if (aiProvider.type === 'openai' || aiProvider.type === 'openrouter') {
+                    if (aiProvider.type === 'openai' || aiProvider.type === 'openrouter') {
                         aiResult = await analyzeWithOpenAI(
                             aiProvider.client,
                             screenshotBase64,
                             analysisType,
                             url,
-                            aiProvider.model // Pass the model (e.g., 'gpt-4o' or 'google/gemini-...')
+                            aiProvider.model
                         );
-                    } else {
+                    } else if (aiProvider.type === 'gemini') {
                         aiResult = await analyzeWithGemini(
                             aiProvider.client,
                             screenshotBase64,
                             analysisType,
                             url
                         );
-                    }
-
-                    // Increment usage counter for free tier (not for demo mode)
-                    if (isFreeMode && aiProvider.type !== 'demo') {
-                        usageTracker.increment();
-                        log.info(`📊 Free tier usage: ${usageTracker.count}/${FREE_TIER_DAILY_LIMIT}`);
+                    } else {
+                        throw new Error(`Unsupported AI provider: ${aiProvider.type}`);
                     }
 
                 } catch (apiError) {
@@ -516,8 +380,7 @@ await Actor.main(async () => {
                     design_flaws: aiResult.design_flaws || [],
                     positive_aspects: aiResult.positive_aspects || [],
                     recommendations: aiResult.recommendations || [],
-                    screenshot_url: screenshotUrl,
-                    free_tier_remaining: isFreeMode ? usageTracker.getRemaining() : null
+                    screenshot_url: screenshotUrl
                 };
 
                 // Save result to dataset
@@ -551,10 +414,5 @@ await Actor.main(async () => {
     await crawler.run(urls);
 
     console.log('✨ AI UI/UX Design Auditor - Completed!');
-
-    if (isDemoMode) {
-        console.log(`🎭 Demo mode completed. Provide your API key for real AI-powered analysis!`);
-    } else if (isFreeMode) {
-        console.log(`📊 Analysis completed using your API key`);
-    }
+    console.log(`📊 Analysis completed using your ${aiProvider.type.toUpperCase()} API key`);
 });

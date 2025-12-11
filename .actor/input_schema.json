@@ -14,21 +14,12 @@
                 }
             ]
         },
-        "useFreeMode": {
-            "title": "Use Free Tier",
-            "type": "boolean",
-            "description": "Enable this to use your own API key with generous free limits. Disable for demo mode (no API key needed).",
-            "default": false,
-            "prefill": false,
-            "editor": "checkbox"
-        },
         "apiKey": {
-            "title": "Your API Key (Required for Free Tier)",
+            "title": "Your API Key (Required)",
             "type": "string",
-            "description": "Get a FREE Gemini API key: https://aistudio.google.com/app/apikey (starts with 'AIza') OR OpenAI key: https://platform.openai.com/api-keys (starts with 'sk-'). Leave empty for demo mode.",
+            "description": "Add your API key: OpenAI (sk-...), OpenRouter (sk-or-...), or Gemini (AIza...). The actor will automatically detect the provider.",
             "editor": "textfield",
-            "isSecret": true,
-            "nullable": true
+            "isSecret": true
         },
         "analysisType": {
             "title": "Analysis Type",
@@ -90,6 +81,7 @@
     },
     "required": [
         "startUrls",
+        "apiKey",
         "analysisType",
         "viewPort"
     ]
