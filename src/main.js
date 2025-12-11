@@ -305,7 +305,7 @@ await Actor.main(async () => {
 
     const {
         startUrls = [],
-        useFreeMode = true,
+        useFreeMode = false, // Default to demo mode
         apiKey,
         analysisType = 'general',
         viewPort = 'desktop',
