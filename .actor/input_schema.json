@@ -19,6 +19,7 @@
             "type": "boolean",
             "description": "Enable this to use your own API key with generous free limits. Disable for demo mode (no API key needed).",
             "default": false,
+            "prefill": false,
             "editor": "checkbox"
         },
         "apiKey": {
