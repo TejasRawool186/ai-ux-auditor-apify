@@ -325,6 +325,425 @@ async function detectTechnologies(page) {
     return technologies;
 }
 
+// Performance analysis function
+async function analyzePerformance(page) {
+    const performance = {
+        page_load_time: 0,
+        page_size_mb: 0,
+        image_count: 0,
+        external_links_count: 0,
+        internal_links_count: 0,
+        form_count: 0,
+        button_count: 0,
+        script_count: 0,
+        stylesheet_count: 0,
+        performance_score: 0
+    };
+
+    try {
+        const perfData = await page.evaluate(() => {
+            const data = {
+                imageCount: document.querySelectorAll('img').length,
+                externalLinks: 0,
+                internalLinks: 0,
+                formCount: document.querySelectorAll('form').length,
+                buttonCount: document.querySelectorAll('button, input[type="button"], input[type="submit"]').length,
+                scriptCount: document.querySelectorAll('script').length,
+                stylesheetCount: document.querySelectorAll('link[rel="stylesheet"]').length
+            };
+
+            // Count internal vs external links
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href.startsWith('http') && !href.includes(window.location.hostname)) {
+                    data.externalLinks++;
+                } else if (href.startsWith('/') || href.includes(window.location.hostname)) {
+                    data.internalLinks++;
+                }
+            });
+
+            return data;
+        });
+
+        Object.assign(performance, perfData);
+        
+        // Calculate performance score based on metrics
+        let score = 10;
+        if (performance.image_count > 50) score -= 2;
+        if (performance.script_count > 20) score -= 1;
+        if (performance.stylesheet_count > 10) score -= 1;
+        performance.performance_score = Math.max(1, score);
+
+    } catch (error) {
+        console.log(`⚠️ Performance analysis failed: ${error.message}`);
+    }
+
+    return performance;
+}
+
+// Accessibility analysis function
+async function analyzeAccessibility(page) {
+    const accessibility = {
+        accessibility_score: 0,
+        wcag_violations: [],
+        keyboard_navigation_score: 0,
+        screen_reader_compatibility: 0,
+        color_blind_friendly: true,
+        font_size_compliance: true,
+        alt_text_missing: 0,
+        heading_structure_score: 0,
+        form_labels_score: 0,
+        contrast_issues: 0
+    };
+
+    try {
+        const a11yData = await page.evaluate(() => {
+            const data = {
+                imagesWithoutAlt: 0,
+                headingStructure: [],
+                formsWithoutLabels: 0,
+                focusableElements: 0,
+                ariaLabels: 0
+            };
+
+            // Check images without alt text
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                if (!img.getAttribute('alt')) {
+                    data.imagesWithoutAlt++;
+                }
+            });
+
+            // Check heading structure
+            const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            headings.forEach(heading => {
+                data.headingStructure.push(heading.tagName);
+            });
+
+            // Check forms without labels
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                const label = document.querySelector(`label[for="${input.id}"]`);
+                const ariaLabel = input.getAttribute('aria-label');
+                if (!label && !ariaLabel) {
+                    data.formsWithoutLabels++;
+                }
+            });
+
+            // Count focusable elements
+            data.focusableElements = document.querySelectorAll('a, button, input, textarea, select, [tabindex]').length;
+
+            // Count aria labels
+            data.ariaLabels = document.querySelectorAll('[aria-label], [aria-labelledby]').length;
+
+            return data;
+        });
+
+        accessibility.alt_text_missing = a11yData.imagesWithoutAlt;
+        accessibility.form_labels_score = Math.max(1, 10 - a11yData.formsWithoutLabels);
+        accessibility.heading_structure_score = a11yData.headingStructure.length > 0 ? 8 : 3;
+
+        // Calculate overall accessibility score
+        let score = 10;
+        if (a11yData.imagesWithoutAlt > 0) score -= 2;
+        if (a11yData.formsWithoutLabels > 0) score -= 2;
+        if (a11yData.headingStructure.length === 0) score -= 1;
+        accessibility.accessibility_score = Math.max(1, score);
+
+        // Add violations based on findings
+        if (a11yData.imagesWithoutAlt > 0) {
+            accessibility.wcag_violations.push('missing-alt-text');
+        }
+        if (a11yData.formsWithoutLabels > 0) {
+            accessibility.wcag_violations.push('unlabeled-form-controls');
+        }
+
+    } catch (error) {
+        console.log(`⚠️ Accessibility analysis failed: ${error.message}`);
+    }
+
+    return accessibility;
+}
+
+// Mobile responsiveness analysis
+async function analyzeMobileResponsiveness(page) {
+    const mobile = {
+        mobile_score: 0,
+        responsive_breakpoints: [],
+        touch_target_compliance: 0,
+        mobile_navigation_type: null,
+        viewport_meta_present: false,
+        mobile_specific_issues: []
+    };
+
+    try {
+        const mobileData = await page.evaluate(() => {
+            const data = {
+                viewportMeta: !!document.querySelector('meta[name="viewport"]'),
+                smallButtons: 0,
+                navigationStyle: null
+            };
+
+            // Check for small touch targets
+            const buttons = document.querySelectorAll('button, a, input[type="button"], input[type="submit"]');
+            buttons.forEach(btn => {
+                const rect = btn.getBoundingClientRect();
+                if (rect.width < 44 || rect.height < 44) {
+                    data.smallButtons++;
+                }
+            });
+
+            // Detect navigation style
+            const hamburger = document.querySelector('.hamburger, .menu-toggle, [class*="mobile-menu"]');
+            const drawer = document.querySelector('.drawer, .sidebar, [class*="nav-drawer"]');
+            if (hamburger || drawer) {
+                data.navigationStyle = 'hamburger';
+            } else {
+                data.navigationStyle = 'standard';
+            }
+
+            return data;
+        });
+
+        mobile.viewport_meta_present = mobileData.viewportMeta;
+        mobile.mobile_navigation_type = mobileData.navigationStyle;
+        mobile.touch_target_compliance = Math.max(1, 10 - mobileData.smallButtons);
+
+        // Calculate mobile score
+        let score = 10;
+        if (!mobileData.viewportMeta) score -= 3;
+        if (mobileData.smallButtons > 5) score -= 2;
+        mobile.mobile_score = Math.max(1, score);
+
+        if (mobileData.smallButtons > 0) {
+            mobile.mobile_specific_issues.push(`${mobileData.smallButtons} touch targets smaller than 44px`);
+        }
+
+    } catch (error) {
+        console.log(`⚠️ Mobile analysis failed: ${error.message}`);
+    }
+
+    return mobile;
+}
+
+// SEO analysis function
+async function analyzeSEO(page) {
+    const seo = {
+        seo_score: 0,
+        meta_title: null,
+        meta_description: null,
+        h1_tags: [],
+        h2_tags: [],
+        missing_meta_tags: [],
+        structured_data_present: false,
+        image_alt_optimization: 0,
+        internal_links_count: 0,
+        external_links_count: 0
+    };
+
+    try {
+        const seoData = await page.evaluate(() => {
+            const data = {
+                title: document.querySelector('title')?.textContent || null,
+                description: document.querySelector('meta[name="description"]')?.getAttribute('content') || null,
+                h1Tags: Array.from(document.querySelectorAll('h1')).map(h => h.textContent.trim()),
+                h2Tags: Array.from(document.querySelectorAll('h2')).map(h => h.textContent.trim()),
+                structuredData: !!document.querySelector('script[type="application/ld+json"]'),
+                imagesWithAlt: document.querySelectorAll('img[alt]').length,
+                totalImages: document.querySelectorAll('img').length
+            };
+
+            return data;
+        });
+
+        seo.meta_title = seoData.title;
+        seo.meta_description = seoData.description;
+        seo.h1_tags = seoData.h1Tags;
+        seo.h2_tags = seoData.h2Tags;
+        seo.structured_data_present = seoData.structuredData;
+        seo.image_alt_optimization = seoData.totalImages > 0 ? 
+            Math.round((seoData.imagesWithAlt / seoData.totalImages) * 100) : 100;
+
+        // Check for missing meta tags
+        if (!seoData.title) seo.missing_meta_tags.push('title');
+        if (!seoData.description) seo.missing_meta_tags.push('meta-description');
+
+        // Calculate SEO score
+        let score = 10;
+        if (!seoData.title) score -= 3;
+        if (!seoData.description) score -= 2;
+        if (seoData.h1Tags.length === 0) score -= 2;
+        if (seo.image_alt_optimization < 80) score -= 1;
+        seo.seo_score = Math.max(1, score);
+
+    } catch (error) {
+        console.log(`⚠️ SEO analysis failed: ${error.message}`);
+    }
+
+    return seo;
+}
+
+// Content analysis function
+async function analyzeContent(page) {
+    const content = {
+        content_score: 0,
+        word_count: 0,
+        paragraph_count: 0,
+        heading_count: 0,
+        call_to_action_count: 0,
+        social_proof_elements: [],
+        readability_score: 0,
+        content_structure_score: 0
+    };
+
+    try {
+        const contentData = await page.evaluate(() => {
+            const data = {
+                textContent: document.body.textContent || '',
+                paragraphs: document.querySelectorAll('p').length,
+                headings: document.querySelectorAll('h1, h2, h3, h4, h5, h6').length,
+                ctaButtons: 0,
+                socialProof: []
+            };
+
+            // Count CTA buttons
+            const ctaSelectors = [
+                'button', 'a[href*="signup"]', 'a[href*="register"]', 
+                'a[href*="buy"]', 'a[href*="purchase"]', '[class*="cta"]',
+                '[class*="button"]', 'input[type="submit"]'
+            ];
+            ctaSelectors.forEach(selector => {
+                data.ctaButtons += document.querySelectorAll(selector).length;
+            });
+
+            // Detect social proof elements
+            if (document.querySelector('[class*="testimonial"]')) {
+                data.socialProof.push('testimonials');
+            }
+            if (document.querySelector('[class*="review"]')) {
+                data.socialProof.push('reviews');
+            }
+            if (document.querySelector('[class*="logo"], [class*="client"]')) {
+                data.socialProof.push('client-logos');
+            }
+            if (document.querySelector('[class*="rating"], [class*="star"]')) {
+                data.socialProof.push('ratings');
+            }
+
+            return data;
+        });
+
+        const words = contentData.textContent.split(/\s+/).filter(word => word.length > 0);
+        content.word_count = words.length;
+        content.paragraph_count = contentData.paragraphs;
+        content.heading_count = contentData.headings;
+        content.call_to_action_count = contentData.ctaButtons;
+        content.social_proof_elements = contentData.socialProof;
+
+        // Calculate content scores
+        content.readability_score = Math.min(10, Math.max(1, Math.round(content.word_count / 100)));
+        content.content_structure_score = Math.min(10, content.heading_count + content.paragraph_count);
+        
+        let score = 5;
+        if (content.word_count > 300) score += 2;
+        if (content.heading_count > 3) score += 1;
+        if (content.call_to_action_count > 0) score += 1;
+        if (content.social_proof_elements.length > 0) score += 1;
+        content.content_score = Math.min(10, score);
+
+    } catch (error) {
+        console.log(`⚠️ Content analysis failed: ${error.message}`);
+    }
+
+    return content;
+}
+
+// Conversion optimization analysis
+async function analyzeConversion(page) {
+    const conversion = {
+        conversion_score: 0,
+        cta_visibility_score: 0,
+        trust_signals: [],
+        friction_points: [],
+        value_proposition_clarity: 0,
+        urgency_elements: [],
+        social_proof_score: 0,
+        form_optimization_score: 0
+    };
+
+    try {
+        const conversionData = await page.evaluate(() => {
+            const data = {
+                ctaButtons: document.querySelectorAll('button, [class*="cta"], [class*="button"]').length,
+                forms: document.querySelectorAll('form').length,
+                trustSignals: [],
+                urgencyElements: [],
+                frictionPoints: []
+            };
+
+            // Detect trust signals
+            if (document.querySelector('[class*="ssl"], [class*="secure"]')) {
+                data.trustSignals.push('ssl-certificate');
+            }
+            if (document.querySelector('[class*="testimonial"]')) {
+                data.trustSignals.push('testimonials');
+            }
+            if (document.querySelector('[class*="guarantee"], [class*="warranty"]')) {
+                data.trustSignals.push('guarantee');
+            }
+            if (document.querySelector('[class*="badge"], [class*="award"]')) {
+                data.trustSignals.push('awards');
+            }
+
+            // Detect urgency elements
+            const urgencyText = document.body.textContent.toLowerCase();
+            if (urgencyText.includes('limited time') || urgencyText.includes('expires')) {
+                data.urgencyElements.push('limited-time-offer');
+            }
+            if (urgencyText.includes('only') && urgencyText.includes('left')) {
+                data.urgencyElements.push('scarcity');
+            }
+            if (urgencyText.includes('today only') || urgencyText.includes('24 hours')) {
+                data.urgencyElements.push('time-sensitive');
+            }
+
+            // Detect friction points
+            const requiredFields = document.querySelectorAll('input[required]').length;
+            if (requiredFields > 5) {
+                data.frictionPoints.push('too-many-required-fields');
+            }
+            if (document.querySelector('input[type="password"]') && !document.querySelector('[class*="signup"], [class*="register"]')) {
+                data.frictionPoints.push('login-required');
+            }
+
+            return data;
+        });
+
+        conversion.trust_signals = conversionData.trustSignals;
+        conversion.urgency_elements = conversionData.urgencyElements;
+        conversion.friction_points = conversionData.frictionPoints;
+        
+        conversion.cta_visibility_score = Math.min(10, conversionData.ctaButtons * 2);
+        conversion.social_proof_score = Math.min(10, conversionData.trustSignals.length * 2);
+        conversion.form_optimization_score = conversionData.forms > 0 ? 
+            Math.max(1, 10 - conversionData.frictionPoints.length * 2) : 10;
+
+        // Calculate overall conversion score
+        let score = 5;
+        score += Math.min(2, conversionData.ctaButtons);
+        score += Math.min(2, conversionData.trustSignals.length);
+        score += Math.min(1, conversionData.urgencyElements.length);
+        score -= conversionData.frictionPoints.length;
+        conversion.conversion_score = Math.max(1, Math.min(10, score));
+
+    } catch (error) {
+        console.log(`⚠️ Conversion analysis failed: ${error.message}`);
+    }
+
+    return conversion;
+}
+
 // Call OpenAI/OpenRouter API with retry logic
 async function analyzeWithOpenAI(client, screenshotBase64, analysisType, url, model = 'gpt-4o') {
     const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.general;
@@ -540,9 +959,27 @@ await Actor.main(async () => {
                     }
                 }
 
-                // Detect technologies used on the website
+                // Comprehensive website analysis
                 log.info('🔍 Detecting technologies...');
                 const technologies = await detectTechnologies(page);
+                
+                log.info('⚡ Analyzing performance metrics...');
+                const performance = await analyzePerformance(page);
+                
+                log.info('♿ Checking accessibility...');
+                const accessibility = await analyzeAccessibility(page);
+                
+                log.info('📱 Testing mobile responsiveness...');
+                const mobile = await analyzeMobileResponsiveness(page);
+                
+                log.info('🔍 Analyzing SEO elements...');
+                const seo = await analyzeSEO(page);
+                
+                log.info('📝 Examining content quality...');
+                const content = await analyzeContent(page);
+                
+                log.info('💰 Evaluating conversion optimization...');
+                const conversion = await analyzeConversion(page);
 
                 // Capture screenshot
                 log.info('📸 Capturing screenshot...');
@@ -604,21 +1041,57 @@ await Actor.main(async () => {
                     throw new Error(`AI analysis failed: ${apiError.message}`);
                 }
 
-                // Construct final result
+                // Construct comprehensive final result
                 const auditResult = {
+                    // Basic Info
                     url,
                     audit_date: new Date().toISOString(),
                     analysis_type: analysisType,
                     viewport: viewPort,
                     ai_provider: aiProvider.type,
-                    score: aiResult.score || 0,
-                    summary: aiResult.summary || 'No summary available',
+                    
+                    // AI Analysis Results
+                    overall_score: aiResult.score || 0,
+                    ai_summary: aiResult.summary || 'No summary available',
                     color_palette: aiResult.color_palette || [],
                     design_flaws: aiResult.design_flaws || [],
                     positive_aspects: aiResult.positive_aspects || [],
-                    recommendations: aiResult.recommendations || [],
-                    screenshot_url: screenshotUrl,
-                    technology_stack: technologies
+                    ai_recommendations: aiResult.recommendations || [],
+                    
+                    // Technology Stack
+                    technology_stack: technologies,
+                    
+                    // Performance Metrics
+                    performance_metrics: performance,
+                    
+                    // Accessibility Analysis
+                    accessibility_analysis: accessibility,
+                    
+                    // Mobile Responsiveness
+                    mobile_analysis: mobile,
+                    
+                    // SEO Analysis
+                    seo_analysis: seo,
+                    
+                    // Content Analysis
+                    content_analysis: content,
+                    
+                    // Conversion Optimization
+                    conversion_analysis: conversion,
+                    
+                    // Comprehensive Scores
+                    scores: {
+                        overall_ux: aiResult.score || 0,
+                        performance: performance.performance_score,
+                        accessibility: accessibility.accessibility_score,
+                        mobile: mobile.mobile_score,
+                        seo: seo.seo_score,
+                        content: content.content_score,
+                        conversion: conversion.conversion_score
+                    },
+                    
+                    // Screenshot
+                    screenshot_url: screenshotUrl
                 };
 
                 // Save result to dataset

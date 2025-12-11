@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
   "name": "ai-ux-auditor",
-  "title": "AI UI/UX Design Auditor",
-  "description": "Automated UI/UX audits powered by AI Vision. Analyze websites for design quality, accessibility, conversion optimization, and more. Get professional UX insights in seconds!",
+  "title": "🚀 Ultimate AI Website Auditor",
+  "description": "The most comprehensive website analysis tool on Apify! AI-powered audits covering UX/UI design, performance, accessibility, SEO, mobile responsiveness, conversion optimization, content analysis, and technology stack detection. Get professional insights in seconds with detailed scores and actionable recommendations!",
   "version": "1.0",
   "meta": {
     "templateId": "crawlee-playwright-javascript"
@@ -18,126 +18,70 @@
   "storages": {
     "dataset": {
       "actorSpecification": 1,
-      "title": "UX Audit Results",
-      "description": "AI-generated UI/UX audit reports with scores, recommendations, and color palette analysis",
+      "title": "🎯 Complete Website Analysis Results",
+      "description": "Comprehensive website audit reports with AI analysis, performance metrics, accessibility scores, SEO analysis, mobile responsiveness, conversion optimization, content analysis, technology stack detection, and actionable recommendations",
       "views": {
         "overview": {
-          "title": "Audit Overview",
+          "title": "📊 Quick Overview",
           "transformation": {
             "fields": [
               "url",
               "analysis_type",
-              "score",
-              "summary",
-              "ai_provider"
+              "overall_score",
+              "ai_summary",
+              "ai_provider",
+              "scores"
             ]
           },
           "display": {
             "component": "table",
             "properties": {
               "url": {
-                "label": "Website URL",
+                "label": "🌐 Website",
                 "format": "link"
               },
               "analysis_type": {
-                "label": "Analysis Type"
+                "label": "🎯 Type"
               },
-              "score": {
-                "label": "UX Score",
+              "overall_score": {
+                "label": "⭐ Overall",
                 "format": "number"
               },
-              "summary": {
-                "label": "Summary"
+              "ai_summary": {
+                "label": "📝 AI Summary"
               },
               "ai_provider": {
-                "label": "AI Provider"
+                "label": "🤖 AI"
+              },
+              "scores": {
+                "label": "📈 All Scores"
               }
             }
           }
         },
-        "keyvalue": {
-          "title": "Key-Value Report",
+        "comprehensive": {
+          "title": "🔍 Comprehensive Analysis",
           "transformation": {
             "fields": [
               "url",
-              "score", 
-              "summary",
+              "audit_date",
               "analysis_type",
               "viewport",
               "ai_provider",
-              "audit_date",
+              "overall_score",
+              "ai_summary",
+              "scores",
+              "performance_metrics",
+              "accessibility_analysis",
+              "mobile_analysis",
+              "seo_analysis",
+              "content_analysis",
+              "conversion_analysis",
+              "technology_stack",
               "color_palette",
               "design_flaws",
               "positive_aspects",
-              "recommendations",
-              "technology_stack",
-              "screenshot_url"
-            ]
-          },
-          "display": {
-            "component": "table",
-            "properties": {
-              "url": {
-                "label": "Website URL",
-                "format": "link"
-              },
-              "score": {
-                "label": "UX Score",
-                "format": "number"
-              },
-              "summary": {
-                "label": "Summary"
-              },
-              "analysis_type": {
-                "label": "Analysis Type"
-              },
-              "viewport": {
-                "label": "Viewport"
-              },
-              "ai_provider": {
-                "label": "AI Provider"
-              },
-              "audit_date": {
-                "label": "Date"
-              },
-              "color_palette": {
-                "label": "Colors"
-              },
-              "design_flaws": {
-                "label": "Issues"
-              },
-              "positive_aspects": {
-                "label": "Strengths"
-              },
-              "recommendations": {
-                "label": "Recommendations"
-              },
-              "technology_stack": {
-                "label": "Tech Stack"
-              },
-              "screenshot_url": {
-                "label": "Screenshot",
-                "format": "link"
-              }
-            }
-          }
-        },
-        "detailed": {
-          "title": "Detailed Report",
-          "transformation": {
-            "fields": [
-              "url",
-              "audit_date", 
-              "analysis_type",
-              "viewport",
-              "ai_provider",
-              "score",
-              "summary",
-              "color_palette",
-              "design_flaws",
-              "positive_aspects", 
-              "recommendations",
-              "technology_stack",
+              "ai_recommendations",
               "screenshot_url"
             ]
           },
@@ -149,7 +93,7 @@
                 "format": "link"
               },
               "audit_date": {
-                "label": "📅 Audit Date",
+                "label": "📅 Date",
                 "format": "datetime"
               },
               "analysis_type": {
@@ -161,31 +105,145 @@
               "ai_provider": {
                 "label": "🤖 AI Provider"
               },
-              "score": {
-                "label": "⭐ UX Score",
+              "overall_score": {
+                "label": "⭐ Overall Score",
                 "format": "number"
               },
-              "summary": {
-                "label": "📝 Summary"
+              "ai_summary": {
+                "label": "📝 AI Summary"
               },
-              "color_palette": {
-                "label": "🎨 Color Palette"
+              "scores": {
+                "label": "📈 All Scores"
               },
-              "design_flaws": {
-                "label": "⚠️ Design Issues"
+              "performance_metrics": {
+                "label": "⚡ Performance"
               },
-              "positive_aspects": {
-                "label": "✅ Positive Aspects"
+              "accessibility_analysis": {
+                "label": "♿ Accessibility"
               },
-              "recommendations": {
-                "label": "💡 Recommendations"
+              "mobile_analysis": {
+                "label": "📱 Mobile"
+              },
+              "seo_analysis": {
+                "label": "🔍 SEO"
+              },
+              "content_analysis": {
+                "label": "📝 Content"
+              },
+              "conversion_analysis": {
+                "label": "💰 Conversion"
               },
               "technology_stack": {
-                "label": "⚙️ Technology Stack"
+                "label": "⚙️ Tech Stack"
+              },
+              "color_palette": {
+                "label": "🎨 Colors"
+              },
+              "design_flaws": {
+                "label": "⚠️ Issues"
+              },
+              "positive_aspects": {
+                "label": "✅ Strengths"
+              },
+              "ai_recommendations": {
+                "label": "💡 AI Recommendations"
               },
               "screenshot_url": {
                 "label": "📸 Screenshot",
                 "format": "link"
+              }
+            }
+          }
+        },
+        "scores": {
+          "title": "📈 Score Breakdown",
+          "transformation": {
+            "fields": [
+              "url",
+              "scores",
+              "overall_score",
+              "performance_metrics.performance_score",
+              "accessibility_analysis.accessibility_score",
+              "mobile_analysis.mobile_score",
+              "seo_analysis.seo_score",
+              "content_analysis.content_score",
+              "conversion_analysis.conversion_score"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "url": {
+                "label": "🌐 Website",
+                "format": "link"
+              },
+              "scores": {
+                "label": "📊 All Scores"
+              },
+              "overall_score": {
+                "label": "⭐ Overall UX",
+                "format": "number"
+              },
+              "performance_metrics.performance_score": {
+                "label": "⚡ Performance",
+                "format": "number"
+              },
+              "accessibility_analysis.accessibility_score": {
+                "label": "♿ Accessibility",
+                "format": "number"
+              },
+              "mobile_analysis.mobile_score": {
+                "label": "📱 Mobile",
+                "format": "number"
+              },
+              "seo_analysis.seo_score": {
+                "label": "🔍 SEO",
+                "format": "number"
+              },
+              "content_analysis.content_score": {
+                "label": "📝 Content",
+                "format": "number"
+              },
+              "conversion_analysis.conversion_score": {
+                "label": "💰 Conversion",
+                "format": "number"
+              }
+            }
+          }
+        },
+        "technical": {
+          "title": "⚙️ Technical Details",
+          "transformation": {
+            "fields": [
+              "url",
+              "technology_stack",
+              "performance_metrics",
+              "accessibility_analysis",
+              "mobile_analysis",
+              "seo_analysis"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "url": {
+                "label": "🌐 Website",
+                "format": "link"
+              },
+              "technology_stack": {
+                "label": "⚙️ Technologies"
+              },
+              "performance_metrics": {
+                "label": "⚡ Performance"
+              },
+              "accessibility_analysis": {
+                "label": "♿ Accessibility"
+              },
+              "mobile_analysis": {
+                "label": "📱 Mobile"
+              },
+              "seo_analysis": {
+                "label": "🔍 SEO"
               }
             }
           }

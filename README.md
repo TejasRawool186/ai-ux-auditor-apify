@@ -1,35 +1,49 @@
-# AI UI/UX Design Auditor
+# 🚀 Ultimate AI Website Auditor
 
-![AI UI/UX Design Auditor Banner](./hero-banner.png)
+![AI Website Auditor Banner](./hero-banner.png)
 
-> **Turn Screenshots into Professional UX Audits in Seconds**  
-> Powered by OpenAI GPT-4o Vision & Google Gemini AI
+> **The Most Comprehensive Website Analysis Tool on Apify**  
+> Powered by OpenAI GPT-4, OpenRouter & Google Gemini AI
 
 ## 🎯 What is this?
 
-The **AI UI/UX Design Auditor** is an Apify Actor that automatically analyzes websites using advanced AI vision technology. Simply provide URLs, and get comprehensive UI/UX audit reports with actionable insights, design scores, and professional recommendations.
+The **Ultimate AI Website Auditor** is the most advanced website analysis tool available. It combines AI vision technology with comprehensive technical analysis to provide complete website audits covering design, performance, accessibility, SEO, mobile responsiveness, conversion optimization, and technology stack detection.
 
-Perfect for designers, developers, agencies, and product teams who want expert-level UX insights without the expert-level price tag.
+Perfect for agencies, developers, marketers, product teams, and anyone who needs professional-grade website analysis without the enterprise price tag.
 
 ---
 
-## ✨ Features
+## ✨ Comprehensive Features
 
-- 🤖 **Dual AI Providers**: Supports both OpenAI GPT-4o Vision and Google Gemini
-- 🎁 **Free Tier Available**: 5 free audits per day using our Gemini API (no credit card needed!)
-- 🎨 **7 Analysis Types**: 
-  - **General** - Overall aesthetics and usability
-  - **Accessibility** - WCAG compliance and inclusive design
-  - **Conversion** - CRO and sales funnel optimization
-  - **Performance** - Visual performance indicators
-  - **SEO** - On-page SEO elements analysis
-  - **Mobile-First** - Mobile UX evaluation
-  - **Brand Consistency** - Color palette and typography analysis
-- 📱 **Desktop & Mobile Views**: Simulate different devices
-- 📸 **Screenshot Capture**: High-quality PNG screenshots saved automatically
-- 🎨 **Color Palette Extraction**: AI identifies your brand colors
-- 📊 **Structured Data**: JSON output perfect for integration
-- ⚡ **Fast & Concurrent**: Analyze multiple sites simultaneously
+### 🤖 **AI-Powered Analysis**
+- **Multi-Provider Support**: OpenAI GPT-4, OpenRouter, Google Gemini
+- **7 Analysis Types**: General, Accessibility, Conversion, Performance, SEO, Mobile-First, Brand Consistency
+- **AI Vision Technology**: Advanced screenshot analysis with actionable insights
+- **Smart Recommendations**: Professional-grade suggestions for improvement
+
+### 📊 **Complete Technical Analysis**
+- **⚡ Performance Metrics**: Load times, resource counts, optimization scores
+- **♿ Accessibility Audit**: WCAG compliance, keyboard navigation, screen reader compatibility
+- **📱 Mobile Responsiveness**: Touch targets, responsive design, mobile UX
+- **🔍 SEO Analysis**: Meta tags, heading structure, structured data, image optimization
+- **📝 Content Analysis**: Word count, readability, CTA analysis, social proof detection
+- **💰 Conversion Optimization**: Trust signals, friction analysis, urgency elements
+
+### ⚙️ **Technology Stack Detection**
+- **Frontend Frameworks**: React, Vue.js, Angular detection
+- **CSS Frameworks**: Bootstrap, Tailwind CSS, Bulma identification
+- **JavaScript Libraries**: jQuery, Lodash, Axios discovery
+- **Analytics & Marketing**: Google Analytics, Facebook Pixel, marketing tools
+- **E-commerce Platforms**: Shopify, WooCommerce, payment processors
+- **CMS Detection**: WordPress, Drupal, Joomla identification
+- **Security & Performance**: SSL certificates, CDNs, service workers
+
+### 📈 **Advanced Reporting**
+- **Multiple Score Categories**: Overall UX, Performance, Accessibility, Mobile, SEO, Content, Conversion
+- **Visual Data Presentation**: 5 different dataset views for various use cases
+- **Color Palette Extraction**: AI-identified brand colors
+- **Screenshot Capture**: High-quality PNG screenshots with direct links
+- **Structured JSON Output**: Perfect for integrations and further analysis
 
 ---
 
