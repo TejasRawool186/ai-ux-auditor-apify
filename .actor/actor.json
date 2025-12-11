@@ -70,6 +70,7 @@
               "design_flaws",
               "positive_aspects",
               "recommendations",
+              "technology_stack",
               "screenshot_url"
             ]
           },
@@ -111,6 +112,9 @@
               "recommendations": {
                 "label": "Recommendations"
               },
+              "technology_stack": {
+                "label": "Tech Stack"
+              },
               "screenshot_url": {
                 "label": "Screenshot",
                 "format": "link"
@@ -133,6 +137,7 @@
               "design_flaws",
               "positive_aspects", 
               "recommendations",
+              "technology_stack",
               "screenshot_url"
             ]
           },
@@ -174,6 +179,9 @@
               },
               "recommendations": {
                 "label": "💡 Recommendations"
+              },
+              "technology_stack": {
+                "label": "⚙️ Technology Stack"
               },
               "screenshot_url": {
                 "label": "📸 Screenshot",

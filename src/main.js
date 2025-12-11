@@ -119,7 +119,211 @@ function initializeAIProvider(apiKey) {
     }
 }
 
-// Removed usage tracking - users provide their own API keys
+// Technology detection function
+async function detectTechnologies(page) {
+    const technologies = {
+        frontend_framework: null,
+        css_framework: null,
+        javascript_libraries: [],
+        analytics: [],
+        hosting_provider: null,
+        cdn: null,
+        cms: null,
+        ecommerce: null,
+        payment_processors: [],
+        chat_widgets: [],
+        marketing_tools: [],
+        security: [],
+        performance: [],
+        fonts: [],
+        icons: [],
+        meta_generator: null,
+        server_info: null
+    };
+
+    try {
+        // Detect technologies by analyzing page content
+        const techData = await page.evaluate(() => {
+            const detectedTech = {
+                scripts: [],
+                stylesheets: [],
+                metaTags: {},
+                globalObjects: [],
+                comments: []
+            };
+
+            // Get all script sources
+            const scripts = document.querySelectorAll('script[src]');
+            scripts.forEach(script => {
+                if (script.src) detectedTech.scripts.push(script.src);
+            });
+
+            // Get all stylesheet sources
+            const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+            stylesheets.forEach(link => {
+                if (link.href) detectedTech.stylesheets.push(link.href);
+            });
+
+            // Get meta tags
+            const metaTags = document.querySelectorAll('meta');
+            metaTags.forEach(meta => {
+                const name = meta.getAttribute('name') || meta.getAttribute('property');
+                const content = meta.getAttribute('content');
+                if (name && content) {
+                    detectedTech.metaTags[name] = content;
+                }
+            });
+
+            // Check for global JavaScript objects
+            const globalChecks = [
+                'React', 'Vue', 'Angular', 'jQuery', '$', 'Shopify', 'WordPress',
+                'gtag', 'ga', 'fbq', 'Intercom', 'Zendesk', 'Stripe', 'PayPal'
+            ];
+            
+            globalChecks.forEach(obj => {
+                if (window[obj]) {
+                    detectedTech.globalObjects.push(obj);
+                }
+            });
+
+            // Get HTML comments (often contain generator info)
+            const walker = document.createTreeWalker(
+                document.documentElement,
+                NodeFilter.SHOW_COMMENT
+            );
+            let comment;
+            while (comment = walker.nextNode()) {
+                detectedTech.comments.push(comment.textContent.trim());
+            }
+
+            return detectedTech;
+        });
+
+        // Analyze the collected data to identify technologies
+        
+        // Frontend Frameworks
+        if (techData.globalObjects.includes('React') || 
+            techData.scripts.some(src => src.includes('react'))) {
+            technologies.frontend_framework = 'React';
+        } else if (techData.globalObjects.includes('Vue') || 
+                   techData.scripts.some(src => src.includes('vue'))) {
+            technologies.frontend_framework = 'Vue.js';
+        } else if (techData.globalObjects.includes('Angular') || 
+                   techData.scripts.some(src => src.includes('angular'))) {
+            technologies.frontend_framework = 'Angular';
+        }
+
+        // CSS Frameworks
+        if (techData.stylesheets.some(href => href.includes('bootstrap'))) {
+            technologies.css_framework = 'Bootstrap';
+        } else if (techData.stylesheets.some(href => href.includes('tailwind'))) {
+            technologies.css_framework = 'Tailwind CSS';
+        } else if (techData.stylesheets.some(href => href.includes('bulma'))) {
+            technologies.css_framework = 'Bulma';
+        }
+
+        // JavaScript Libraries
+        if (techData.globalObjects.includes('jQuery') || techData.globalObjects.includes('$')) {
+            technologies.javascript_libraries.push('jQuery');
+        }
+        if (techData.scripts.some(src => src.includes('lodash'))) {
+            technologies.javascript_libraries.push('Lodash');
+        }
+        if (techData.scripts.some(src => src.includes('axios'))) {
+            technologies.javascript_libraries.push('Axios');
+        }
+
+        // Analytics
+        if (techData.globalObjects.includes('gtag') || techData.globalObjects.includes('ga') ||
+            techData.scripts.some(src => src.includes('googletagmanager'))) {
+            technologies.analytics.push('Google Analytics');
+        }
+        if (techData.globalObjects.includes('fbq') || 
+            techData.scripts.some(src => src.includes('facebook.net'))) {
+            technologies.analytics.push('Facebook Pixel');
+        }
+
+        // CMS Detection
+        if (techData.metaTags.generator) {
+            const generator = techData.metaTags.generator.toLowerCase();
+            if (generator.includes('wordpress')) {
+                technologies.cms = 'WordPress';
+            } else if (generator.includes('drupal')) {
+                technologies.cms = 'Drupal';
+            } else if (generator.includes('joomla')) {
+                technologies.cms = 'Joomla';
+            }
+            technologies.meta_generator = techData.metaTags.generator;
+        }
+
+        // E-commerce
+        if (techData.globalObjects.includes('Shopify') || 
+            techData.scripts.some(src => src.includes('shopify'))) {
+            technologies.ecommerce = 'Shopify';
+        } else if (techData.scripts.some(src => src.includes('woocommerce'))) {
+            technologies.ecommerce = 'WooCommerce';
+        }
+
+        // Payment Processors
+        if (techData.globalObjects.includes('Stripe') || 
+            techData.scripts.some(src => src.includes('stripe'))) {
+            technologies.payment_processors.push('Stripe');
+        }
+        if (techData.globalObjects.includes('PayPal') || 
+            techData.scripts.some(src => src.includes('paypal'))) {
+            technologies.payment_processors.push('PayPal');
+        }
+
+        // Chat Widgets
+        if (techData.globalObjects.includes('Intercom') || 
+            techData.scripts.some(src => src.includes('intercom'))) {
+            technologies.chat_widgets.push('Intercom');
+        }
+        if (techData.globalObjects.includes('Zendesk') || 
+            techData.scripts.some(src => src.includes('zendesk'))) {
+            technologies.chat_widgets.push('Zendesk');
+        }
+
+        // Fonts
+        if (techData.stylesheets.some(href => href.includes('fonts.googleapis.com'))) {
+            technologies.fonts.push('Google Fonts');
+        }
+        if (techData.stylesheets.some(href => href.includes('typekit') || href.includes('adobe'))) {
+            technologies.fonts.push('Adobe Fonts');
+        }
+
+        // Icons
+        if (techData.stylesheets.some(href => href.includes('font-awesome'))) {
+            technologies.icons.push('Font Awesome');
+        }
+        if (techData.stylesheets.some(href => href.includes('heroicons'))) {
+            technologies.icons.push('Heroicons');
+        }
+
+        // CDN Detection
+        if (techData.scripts.some(src => src.includes('cloudflare')) || 
+            techData.stylesheets.some(href => href.includes('cloudflare'))) {
+            technologies.cdn = 'Cloudflare';
+        } else if (techData.scripts.some(src => src.includes('jsdelivr'))) {
+            technologies.cdn = 'jsDelivr';
+        }
+
+        // Security
+        if (window.location.protocol === 'https:') {
+            technologies.security.push('SSL Certificate');
+        }
+
+        // Performance
+        if ('serviceWorker' in navigator) {
+            technologies.performance.push('Service Worker');
+        }
+
+    } catch (error) {
+        console.log(`⚠️ Technology detection failed: ${error.message}`);
+    }
+
+    return technologies;
+}
 
 // Call OpenAI/OpenRouter API with retry logic
 async function analyzeWithOpenAI(client, screenshotBase64, analysisType, url, model = 'gpt-4o') {
@@ -336,6 +540,10 @@ await Actor.main(async () => {
                     }
                 }
 
+                // Detect technologies used on the website
+                log.info('🔍 Detecting technologies...');
+                const technologies = await detectTechnologies(page);
+
                 // Capture screenshot
                 log.info('📸 Capturing screenshot...');
                 const screenshotBuffer = await page.screenshot({
@@ -409,7 +617,8 @@ await Actor.main(async () => {
                     design_flaws: aiResult.design_flaws || [],
                     positive_aspects: aiResult.positive_aspects || [],
                     recommendations: aiResult.recommendations || [],
-                    screenshot_url: screenshotUrl
+                    screenshot_url: screenshotUrl,
+                    technology_stack: technologies
                 };
 
                 // Save result to dataset
