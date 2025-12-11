@@ -1041,6 +1041,73 @@ await Actor.main(async () => {
                     throw new Error(`AI analysis failed: ${apiError.message}`);
                 }
 
+                // Create a flattened version for vertical display
+                const flattenedResult = {
+                    'Website URL': url,
+                    'Audit Date': new Date().toISOString(),
+                    'Analysis Type': analysisType,
+                    'Viewport': viewPort,
+                    'AI Provider': aiProvider.type,
+                    
+                    // Scores
+                    '⭐ Overall UX Score': aiResult.score || 0,
+                    '⚡ Performance Score': performance.performance_score,
+                    '♿ Accessibility Score': accessibility.accessibility_score,
+                    '📱 Mobile Score': mobile.mobile_score,
+                    '🔍 SEO Score': seo.seo_score,
+                    '📝 Content Score': content.content_score,
+                    '💰 Conversion Score': conversion.conversion_score,
+                    
+                    // AI Analysis
+                    '📝 AI Summary': aiResult.summary || 'No summary available',
+                    '🎨 Color Palette': (aiResult.color_palette || []).join(', '),
+                    '⚠️ Design Issues': (aiResult.design_flaws || []).join(' | '),
+                    '✅ Positive Aspects': (aiResult.positive_aspects || []).join(' | '),
+                    '💡 AI Recommendations': (aiResult.recommendations || []).join(' | '),
+                    
+                    // Technology
+                    '⚛️ Frontend Framework': technologies.frontend_framework || 'Not detected',
+                    '🎨 CSS Framework': technologies.css_framework || 'Not detected',
+                    '📄 CMS Platform': technologies.cms || 'Not detected',
+                    '🛒 E-commerce Platform': technologies.ecommerce || 'Not detected',
+                    '📊 Analytics Tools': technologies.analytics.join(', ') || 'None detected',
+                    
+                    // Performance
+                    '🖼️ Image Count': performance.image_count,
+                    '🔘 Button Count': performance.button_count,
+                    '📝 Form Count': performance.form_count,
+                    '📜 Script Count': performance.script_count,
+                    
+                    // Accessibility
+                    '⚠️ Missing Alt Text': accessibility.alt_text_missing,
+                    '🚫 WCAG Violations': accessibility.wcag_violations.join(', ') || 'None found',
+                    '📋 Form Labels Score': accessibility.form_labels_score,
+                    
+                    // Mobile
+                    '👆 Touch Target Score': mobile.touch_target_compliance,
+                    '📱 Viewport Meta Present': mobile.viewport_meta_present ? 'Yes' : 'No',
+                    '🍔 Navigation Type': mobile.mobile_navigation_type || 'Standard',
+                    
+                    // SEO
+                    '📄 Meta Title': seo.meta_title || 'Missing',
+                    '📝 Meta Description': seo.meta_description || 'Missing',
+                    '📰 H1 Tags': seo.h1_tags.join(', ') || 'None found',
+                    '🖼️ Image Alt Optimization': `${seo.image_alt_optimization}%`,
+                    
+                    // Content
+                    '📊 Word Count': content.word_count,
+                    '📢 CTA Count': content.call_to_action_count,
+                    '🏆 Social Proof Elements': content.social_proof_elements.join(', ') || 'None detected',
+                    
+                    // Conversion
+                    '🛡️ Trust Signals': conversion.trust_signals.join(', ') || 'None detected',
+                    '⚠️ Friction Points': conversion.friction_points.join(', ') || 'None detected',
+                    '🎯 CTA Visibility Score': conversion.cta_visibility_score,
+                    
+                    // Screenshot
+                    '📸 Screenshot URL': screenshotUrl
+                };
+
                 // Construct comprehensive final result
                 const auditResult = {
                     // Basic Info
@@ -1094,8 +1161,12 @@ await Actor.main(async () => {
                     screenshot_url: screenshotUrl
                 };
 
-                // Save result to dataset
+                // Save both comprehensive and flattened results to dataset
                 await Actor.pushData(auditResult);
+                await Actor.pushData({
+                    ...flattenedResult,
+                    _type: 'flattened_report' // Add type identifier
+                });
                 log.info(`✅ Audit complete for ${url} - Score: ${auditResult.score}/10`);
 
             } catch (error) {

@@ -59,6 +59,132 @@
             }
           }
         },
+        "key_value_pairs": {
+          "title": "📋 Key-Value Pairs (Vertical Style)",
+          "transformation": {
+            "fields": [
+              "Website URL",
+              "⭐ Overall UX Score",
+              "⚡ Performance Score", 
+              "♿ Accessibility Score",
+              "📱 Mobile Score",
+              "🔍 SEO Score",
+              "📝 Content Score",
+              "💰 Conversion Score",
+              "📝 AI Summary",
+              "⚛️ Frontend Framework",
+              "🎨 CSS Framework",
+              "📄 CMS Platform",
+              "🛒 E-commerce Platform",
+              "📊 Analytics Tools",
+              "🖼️ Image Count",
+              "🔘 Button Count",
+              "📝 Form Count",
+              "⚠️ Missing Alt Text",
+              "🚫 WCAG Violations",
+              "👆 Touch Target Score",
+              "📱 Viewport Meta Present",
+              "📄 Meta Title",
+              "📝 Meta Description",
+              "📰 H1 Tags",
+              "📊 Word Count",
+              "📢 CTA Count",
+              "🏆 Social Proof Elements",
+              "🛡️ Trust Signals",
+              "⚠️ Friction Points",
+              "🎨 Color Palette",
+              "⚠️ Design Issues",
+              "✅ Positive Aspects",
+              "💡 AI Recommendations",
+              "📸 Screenshot URL"
+            ],
+            "filter": {
+              "_type": "flattened_report"
+            }
+          },
+          "display": {
+            "component": "table"
+          }
+        },
+        "detailed_breakdown": {
+          "title": "📋 Detailed Breakdown",
+          "transformation": {
+            "fields": [
+              "url",
+              "overall_score",
+              "ai_summary",
+              "scores",
+              "technology_stack",
+              "performance_metrics", 
+              "accessibility_analysis",
+              "mobile_analysis",
+              "seo_analysis",
+              "content_analysis",
+              "conversion_analysis",
+              "color_palette",
+              "design_flaws",
+              "positive_aspects",
+              "ai_recommendations",
+              "screenshot_url"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "url": {
+                "label": "🌐 Website URL",
+                "format": "link"
+              },
+              "overall_score": {
+                "label": "⭐ Overall Score",
+                "format": "number"
+              },
+              "ai_summary": {
+                "label": "📝 AI Summary"
+              },
+              "scores": {
+                "label": "📊 All Scores"
+              },
+              "technology_stack": {
+                "label": "⚙️ Technology Stack"
+              },
+              "performance_metrics": {
+                "label": "⚡ Performance Metrics"
+              },
+              "accessibility_analysis": {
+                "label": "♿ Accessibility Analysis"
+              },
+              "mobile_analysis": {
+                "label": "📱 Mobile Analysis"
+              },
+              "seo_analysis": {
+                "label": "🔍 SEO Analysis"
+              },
+              "content_analysis": {
+                "label": "📝 Content Analysis"
+              },
+              "conversion_analysis": {
+                "label": "💰 Conversion Analysis"
+              },
+              "color_palette": {
+                "label": "🎨 Color Palette"
+              },
+              "design_flaws": {
+                "label": "⚠️ Design Issues"
+              },
+              "positive_aspects": {
+                "label": "✅ Positive Aspects"
+              },
+              "ai_recommendations": {
+                "label": "💡 AI Recommendations"
+              },
+              "screenshot_url": {
+                "label": "📸 Screenshot",
+                "format": "link"
+              }
+            }
+          }
+        },
         "comprehensive": {
           "title": "🔍 Comprehensive Analysis",
           "transformation": {
