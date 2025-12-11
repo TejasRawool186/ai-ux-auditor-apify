@@ -1,0 +1,79 @@
+[
+  {
+    "url": "https://www.apple.com",
+    "audit_date": "2025-12-11T08:30:15.123Z",
+    "analysis_type": "general",
+    "viewport": "desktop",
+    "ai_provider": "openrouter",
+    "score": 9.2,
+    "summary": "Exceptional design with premium aesthetics, perfect typography hierarchy, and seamless user experience. Apple's signature minimalist approach creates an elegant and highly usable interface.",
+    "color_palette": [
+      "#000000",
+      "#FFFFFF", 
+      "#F5F5F7",
+      "#1D1D1F",
+      "#0071E3"
+    ],
+    "design_flaws": [
+      "Some product images could benefit from better alt text for accessibility",
+      "Navigation menu items are quite small on mobile devices",
+      "Loading animations could be more prominent for slower connections"
+    ],
+    "positive_aspects": [
+      "Outstanding use of whitespace creates breathing room and focus",
+      "Typography is perfectly sized and highly readable across all devices",
+      "Color contrast meets WCAG AA standards throughout",
+      "Hero imagery is stunning and professionally optimized",
+      "Navigation is intuitive and follows established patterns",
+      "Call-to-action buttons are prominently placed and well-designed"
+    ],
+    "recommendations": [
+      "Add more descriptive alt text for product images to improve accessibility",
+      "Consider increasing touch target sizes for mobile navigation (minimum 44x44px)",
+      "Implement skeleton loading states for better perceived performance",
+      "Add breadcrumb navigation for deeper product pages",
+      "Consider A/B testing different CTA button colors for conversion optimization"
+    ],
+    "screenshot_url": "https://api.apify.com/v2/key-value-stores/abc123def456/records/SCREENSHOT_req_001.png",
+    "free_tier_remaining": 4
+  },
+  {
+    "url": "https://www.google.com",
+    "audit_date": "2025-12-11T08:30:45.789Z",
+    "analysis_type": "general", 
+    "viewport": "desktop",
+    "ai_provider": "openrouter",
+    "score": 8.7,
+    "summary": "Clean, functional design focused on search functionality. Google's minimalist approach prioritizes usability over visual complexity, creating an instantly recognizable and highly effective interface.",
+    "color_palette": [
+      "#FFFFFF",
+      "#F8F9FA",
+      "#4285F4",
+      "#34A853", 
+      "#FBBC04",
+      "#EA4335"
+    ],
+    "design_flaws": [
+      "The 'I'm Feeling Lucky' button serves little purpose in modern usage",
+      "Footer links are quite small and could be more prominent",
+      "Search suggestions dropdown could have better visual hierarchy"
+    ],
+    "positive_aspects": [
+      "Iconic and instantly recognizable design that users trust",
+      "Search box is perfectly centered and appropriately sized",
+      "Excellent loading performance with minimal visual elements",
+      "Google logo is well-proportioned and professionally rendered",
+      "Clean typography with excellent readability",
+      "Responsive design works flawlessly across all devices"
+    ],
+    "recommendations": [
+      "Consider removing or repositioning the 'I'm Feeling Lucky' button",
+      "Increase footer link sizes for better accessibility",
+      "Add subtle animations to search suggestions for better UX",
+      "Implement dark mode option for user preference",
+      "Consider adding trending searches or quick access shortcuts"
+    ],
+    "screenshot_url": "https://api.apify.com/v2/key-value-stores/abc123def456/records/SCREENSHOT_req_002.png",
+    "free_tier_remaining": 3
+  }
+]

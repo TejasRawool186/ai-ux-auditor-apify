@@ -1,0 +1,36 @@
+{
+  "navigation_timeout": {
+    "url": "https://slow-website.com",
+    "status": "FAILED",
+    "error": "Navigation timeout: Page took longer than 30 seconds to load",
+    "audit_date": "2025-12-11T08:30:15.123Z",
+    "analysis_type": "general",
+    "viewport": "desktop"
+  },
+
+  "blocked_website": {
+    "url": "https://geo-blocked-site.com", 
+    "status": "FAILED",
+    "error": "Access denied: Website may be geo-blocked or require authentication",
+    "audit_date": "2025-12-11T08:30:15.123Z",
+    "analysis_type": "general",
+    "viewport": "desktop"
+  },
+
+  "api_limit_reached": {
+    "url": "https://example.com",
+    "status": "LIMIT_REACHED", 
+    "message": "Free tier limit reached (5 audits per day). Please provide your own API key for unlimited audits.",
+    "audit_date": "2025-12-11T08:30:15.123Z",
+    "free_tier_remaining": 0
+  },
+
+  "invalid_api_key": {
+    "url": "https://example.com",
+    "status": "FAILED",
+    "error": "Invalid API Key provided. Please check your OpenAI, OpenRouter, or Gemini API key.",
+    "audit_date": "2025-12-11T08:30:15.123Z",
+    "analysis_type": "general",
+    "viewport": "desktop"
+  }
+}

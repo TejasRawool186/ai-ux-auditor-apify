@@ -17,14 +17,14 @@
         "useFreeMode": {
             "title": "Use Free Tier",
             "type": "boolean",
-            "description": "Enable this to use the free tier (5 audits per day). Disable to use your own API key for unlimited audits.",
-            "default": true,
+            "description": "Enable this to use your own API key with generous free limits. Disable for demo mode (no API key needed).",
+            "default": false,
             "editor": "checkbox"
         },
         "apiKey": {
-            "title": "Your API Key (Optional)",
+            "title": "Your API Key (Required for Free Tier)",
             "type": "string",
-            "description": "Provide your own OpenAI (sk-...) or Google Gemini (AIza...) API key for unlimited audits. Leave empty to use free tier.",
+            "description": "Get a FREE Gemini API key: https://aistudio.google.com/app/apikey (starts with 'AIza') OR OpenAI key: https://platform.openai.com/api-keys (starts with 'sk-'). Leave empty for demo mode.",
             "editor": "textfield",
             "isSecret": true,
             "nullable": true

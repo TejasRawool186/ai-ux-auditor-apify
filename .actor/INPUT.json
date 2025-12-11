@@ -1,10 +1,10 @@
 {
     "startUrls": [
         {
-            "url": "https://www.apple.com"
+            "url": "https://www.calculator.net"
         }
     ],
-    "useFreeMode": true,
+    "useFreeMode": false,
     "analysisType": "general",
     "viewPort": "desktop",
     "maxConcurrency": 1

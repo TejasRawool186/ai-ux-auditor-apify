@@ -1,0 +1,122 @@
+{
+  "accessibility_analysis": {
+    "url": "https://example.com",
+    "analysis_type": "accessibility",
+    "score": 7.5,
+    "summary": "Good accessibility foundation but needs improvements in color contrast and keyboard navigation. Several WCAG AA violations detected.",
+    "design_flaws": [
+      "Primary CTA button has insufficient color contrast (3.2:1, needs 4.5:1)",
+      "Form labels are not properly associated with input fields",
+      "Navigation menu lacks keyboard focus indicators",
+      "Images missing descriptive alt text",
+      "Text size below 16px on mobile devices"
+    ],
+    "positive_aspects": [
+      "Semantic HTML structure is well-implemented",
+      "Heading hierarchy follows proper H1-H6 order",
+      "Skip navigation link is present",
+      "Form validation provides clear error messages"
+    ],
+    "recommendations": [
+      "Increase button contrast to meet WCAG AA standards (4.5:1 minimum)",
+      "Add proper aria-labels and form associations",
+      "Implement visible focus indicators for keyboard navigation",
+      "Add descriptive alt text for all images",
+      "Increase base font size to 16px minimum on mobile"
+    ]
+  },
+
+  "conversion_analysis": {
+    "url": "https://ecommerce-example.com",
+    "analysis_type": "conversion",
+    "score": 6.8,
+    "summary": "Decent conversion potential but lacks trust signals and has friction points in the purchase funnel. CTA placement needs optimization.",
+    "design_flaws": [
+      "Primary CTA button is below the fold on mobile",
+      "No visible trust badges or security certificates",
+      "Product images lack zoom functionality",
+      "Checkout process requires account creation",
+      "No customer reviews visible on product pages"
+    ],
+    "positive_aspects": [
+      "Clear value proposition in hero section",
+      "Product pricing is prominently displayed",
+      "Free shipping offer is highlighted",
+      "Clean product grid layout",
+      "Mobile-responsive design"
+    ],
+    "recommendations": [
+      "Move primary CTA above the fold on all devices",
+      "Add trust badges (SSL, payment security, guarantees)",
+      "Implement product image zoom and multiple angles",
+      "Offer guest checkout option to reduce friction",
+      "Display customer reviews and ratings prominently",
+      "Add urgency elements (limited time offers, stock levels)",
+      "Implement exit-intent popups with discount offers"
+    ]
+  },
+
+  "mobile_first_analysis": {
+    "url": "https://mobile-site.com",
+    "analysis_type": "mobile-first",
+    "score": 8.1,
+    "summary": "Strong mobile-first design with good touch targets and responsive layout. Minor improvements needed for thumb-friendly navigation.",
+    "design_flaws": [
+      "Navigation menu items are 40px (should be 44px minimum)",
+      "Search icon is positioned outside thumb-friendly zone",
+      "Form inputs could be larger for easier tapping",
+      "Horizontal scrolling required for some content sections"
+    ],
+    "positive_aspects": [
+      "Excellent responsive breakpoints and fluid layout",
+      "Touch targets are mostly appropriately sized",
+      "Content is easily scannable on small screens",
+      "Fast loading with optimized images",
+      "Swipe gestures work smoothly",
+      "Vertical navigation is thumb-friendly"
+    ],
+    "recommendations": [
+      "Increase all touch targets to minimum 44x44px",
+      "Reposition search to bottom navigation for thumb access",
+      "Enlarge form inputs and add more padding",
+      "Eliminate horizontal scrolling on all screen sizes",
+      "Add pull-to-refresh functionality",
+      "Implement bottom sheet navigation for better reachability"
+    ]
+  },
+
+  "brand_consistency_analysis": {
+    "url": "https://brand-example.com",
+    "analysis_type": "brand-consistency",
+    "score": 9.0,
+    "summary": "Excellent brand consistency with cohesive color palette and typography. Strong visual identity maintained throughout the interface.",
+    "color_palette": [
+      "#2C3E50",
+      "#3498DB", 
+      "#E74C3C",
+      "#F39C12",
+      "#FFFFFF",
+      "#ECF0F1"
+    ],
+    "design_flaws": [
+      "Secondary buttons use inconsistent styling",
+      "Icon styles vary between sections (outline vs filled)",
+      "Some images don't follow brand color treatment"
+    ],
+    "positive_aspects": [
+      "Primary brand colors used consistently throughout",
+      "Typography hierarchy is well-established and maintained",
+      "Logo placement and sizing is consistent",
+      "Brand voice reflected in UI copy and messaging",
+      "Consistent spacing and layout grid system",
+      "Cohesive illustration and photography style"
+    ],
+    "recommendations": [
+      "Standardize secondary button styles across all pages",
+      "Create icon style guide and apply consistently",
+      "Apply brand color filters to photography",
+      "Develop component library for design consistency",
+      "Document brand guidelines for future development"
+    ]
+  }
+}

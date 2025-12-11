@@ -5,8 +5,7 @@ import { PlaywrightCrawler } from 'crawlee';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Your OpenRouter API key for free tier (this should be kept secure in production)
-const FREE_TIER_OPENROUTER_KEY = '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';
+// Free tier configuration - users must provide their own API key
 const FREE_TIER_DAILY_LIMIT = 5;
 
 // Analysis prompts for each audit type
@@ -84,37 +83,22 @@ Extract color palette and evaluate brand design.`
 
 // Initialize AI provider based on configuration
 function initializeAIProvider(apiKey, useFreeMode) {
-    // Determine which AI provider to use
-    if (useFreeMode) {
-        console.log('🎁 Using FREE TIER with OpenRouter API');
-        return {
-            type: 'openrouter',
-            client: new OpenAI({
-                apiKey: FREE_TIER_OPENROUTER_KEY,
-                baseURL: 'https://openrouter.ai/api/v1',
-                defaultHeaders: {
-                    'HTTP-Referer': 'https://apify.com/', // Optional, for including your app on openrouter.ai rankings.
-                    'X-Title': 'Apify UI/UX Auditor', // Optional. Shows in rankings on openrouter.ai.
-                },
-            }),
-            model: 'google/gemini-2.0-flash-exp:free' // Using a free model on OpenRouter
-        };
+    // If free mode is enabled but no API key provided, show error
+    if (useFreeMode && !apiKey) {
+        throw new Error(`Free tier requires you to provide your own API key. Please:
+1. Get a free Gemini API key from https://aistudio.google.com/app/apikey
+2. Or get an OpenAI API key from https://platform.openai.com/api-keys
+3. Add it to the "API Key" field in the actor input
+4. Or disable "Use Free Tier" and the actor will show a demo error message`);
     }
 
     if (!apiKey) {
-        // Default to free tier if no key provided
-        console.log('🎁 No API key provided. Using FREE TIER with OpenRouter API');
+        // No API key provided and free mode disabled - return demo mode
+        console.log('🎭 DEMO MODE: No API key provided. Will show sample analysis.');
         return {
-            type: 'openrouter',
-            client: new OpenAI({
-                apiKey: FREE_TIER_OPENROUTER_KEY,
-                baseURL: 'https://openrouter.ai/api/v1',
-                defaultHeaders: {
-                    'HTTP-Referer': 'https://apify.com/',
-                    'X-Title': 'Apify UI/UX Auditor',
-                },
-            }),
-            model: 'google/gemini-2.0-flash-exp:free'
+            type: 'demo',
+            client: null,
+            model: 'demo'
         };
     }
 
@@ -209,6 +193,58 @@ Output a strict JSON object with this exact structure:
     return JSON.parse(response.choices[0].message.content);
 }
 
+// Demo analysis for when no API key is provided
+function getDemoAnalysis(analysisType, url) {
+    const demoResults = {
+        general: {
+            score: 7.5,
+            summary: "Demo analysis: This appears to be a well-structured website with good visual hierarchy. The layout is clean and professional.",
+            color_palette: ["#FFFFFF", "#000000", "#0066CC", "#F5F5F5", "#333333"],
+            design_flaws: [
+                "Demo: Some elements could benefit from better spacing",
+                "Demo: Color contrast could be improved in certain areas",
+                "Demo: Navigation could be more prominent"
+            ],
+            positive_aspects: [
+                "Demo: Clean and professional layout",
+                "Demo: Good use of whitespace",
+                "Demo: Consistent typography throughout"
+            ],
+            recommendations: [
+                "Demo: Consider adding more visual hierarchy",
+                "Demo: Improve color contrast for better accessibility",
+                "Demo: Add more prominent call-to-action buttons"
+            ]
+        },
+        accessibility: {
+            score: 6.8,
+            summary: "Demo accessibility analysis: The site has basic accessibility features but needs improvements in contrast and keyboard navigation.",
+            color_palette: ["#FFFFFF", "#000000", "#0066CC", "#F5F5F5"],
+            design_flaws: [
+                "Demo: Insufficient color contrast in some areas",
+                "Demo: Missing alt text for images",
+                "Demo: Keyboard navigation could be improved"
+            ],
+            positive_aspects: [
+                "Demo: Semantic HTML structure appears to be used",
+                "Demo: Text is generally readable",
+                "Demo: Basic heading structure is present"
+            ],
+            recommendations: [
+                "Demo: Increase color contrast to meet WCAG standards",
+                "Demo: Add descriptive alt text for all images",
+                "Demo: Implement better keyboard navigation"
+            ]
+        }
+    };
+
+    const result = demoResults[analysisType] || demoResults.general;
+    return {
+        ...result,
+        demo_note: "This is a demo analysis. Provide your API key for real AI-powered insights."
+    };
+}
+
 // Call Google Gemini Vision API (Native)
 async function analyzeWithGemini(client, screenshotBase64, analysisType, url) {
     const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.general;
@@ -260,7 +296,7 @@ await Actor.main(async () => {
         console.log('⚠️ No input provided, using default input for local testing...');
         input = {
             startUrls: [{ url: 'https://www.apple.com' }],
-            useFreeMode: true,
+            useFreeMode: false, // Demo mode for local testing
             analysisType: 'general',
             viewPort: 'desktop',
             maxConcurrency: 1
@@ -291,7 +327,8 @@ await Actor.main(async () => {
         throw new Error(`Failed to initialize AI provider: ${error.message}`);
     }
 
-    const isFreeMode = (aiProvider.type === 'openrouter' || aiProvider.type === 'gemini') && useFreeMode && !apiKey;
+    const isFreeMode = useFreeMode && apiKey; // Free mode when user provides their own key
+    const isDemoMode = aiProvider.type === 'demo';
 
     // Configure viewport dimensions
     const viewportConfig = viewPort === 'mobile'
@@ -302,8 +339,10 @@ await Actor.main(async () => {
     console.log(`🎯 Analysis Type: ${analysisType}`);
     console.log(`🤖 AI Provider: ${aiProvider.type.toUpperCase()}`);
 
-    if (isFreeMode) {
-        console.log(`🎁 FREE TIER MODE: ${FREE_TIER_DAILY_LIMIT} audits per day limit`);
+    if (isDemoMode) {
+        console.log(`🎭 DEMO MODE: Sample analysis will be provided. Add your API key for real AI insights!`);
+    } else if (isFreeMode) {
+        console.log(`🎁 FREE TIER MODE: Using your API key with generous free limits`);
     }
 
     // Initialize Playwright Crawler
@@ -401,7 +440,11 @@ await Actor.main(async () => {
                 let aiResult;
 
                 try {
-                    if (aiProvider.type === 'openai' || aiProvider.type === 'openrouter') {
+                    if (aiProvider.type === 'demo') {
+                        // Demo mode - return sample analysis
+                        log.info('🎭 Generating demo analysis...');
+                        aiResult = getDemoAnalysis(analysisType, url);
+                    } else if (aiProvider.type === 'openai' || aiProvider.type === 'openrouter') {
                         aiResult = await analyzeWithOpenAI(
                             aiProvider.client,
                             screenshotBase64,
@@ -418,8 +461,8 @@ await Actor.main(async () => {
                         );
                     }
 
-                    // Increment usage counter for free tier
-                    if (isFreeMode) {
+                    // Increment usage counter for free tier (not for demo mode)
+                    if (isFreeMode && aiProvider.type !== 'demo') {
                         usageTracker.increment();
                         log.info(`📊 Free tier usage: ${usageTracker.count}/${FREE_TIER_DAILY_LIMIT}`);
                     }
@@ -484,8 +527,9 @@ await Actor.main(async () => {
 
     console.log('✨ AI UI/UX Design Auditor - Completed!');
 
-    if (isFreeMode) {
-        console.log(`📊 Total audits processed: ${usageTracker.count}/${FREE_TIER_DAILY_LIMIT}`);
-        console.log(`📈 Remaining free audits: ${usageTracker.getRemaining()}`);
+    if (isDemoMode) {
+        console.log(`🎭 Demo mode completed. Provide your API key for real AI-powered analysis!`);
+    } else if (isFreeMode) {
+        console.log(`📊 Analysis completed using your API key`);
     }
 });
