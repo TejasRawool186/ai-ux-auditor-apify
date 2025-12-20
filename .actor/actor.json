@@ -10,6 +10,7 @@
   "input": "./input_schema.json",
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
+  "output": "./output_schema.json",
   "categories": [
     "TOOLS",
     "AI",
@@ -65,7 +66,7 @@
             "fields": [
               "Website URL",
               "⭐ Overall UX Score",
-              "⚡ Performance Score", 
+              "⚡ Performance Score",
               "♿ Accessibility Score",
               "📱 Mobile Score",
               "🔍 SEO Score",
@@ -115,7 +116,7 @@
               "ai_summary",
               "scores",
               "technology_stack",
-              "performance_metrics", 
+              "performance_metrics",
               "accessibility_analysis",
               "mobile_analysis",
               "seo_analysis",

@@ -1,0 +1,50 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "AI Website Auditor Output",
+    "description": "Complete website audit results including AI-powered UX/UI analysis, performance metrics, accessibility scores, SEO insights, and actionable recommendations.",
+    "type": "object",
+    "properties": {
+        "overview": {
+            "type": "string",
+            "title": "📊 Quick Overview",
+            "description": "High-level summary of all website audits with overall scores and AI summaries",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        },
+        "detailedBreakdown": {
+            "type": "string",
+            "title": "📋 Detailed Breakdown",
+            "description": "Comprehensive analysis including all scores, technology stack, and recommendations",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=detailed_breakdown"
+        },
+        "scoreBreakdown": {
+            "type": "string",
+            "title": "📈 Score Breakdown",
+            "description": "All individual scores for performance, accessibility, mobile, SEO, content, and conversion",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=scores"
+        },
+        "technicalDetails": {
+            "type": "string",
+            "title": "⚙️ Technical Details",
+            "description": "Technology stack detection, performance metrics, and technical analysis",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=technical"
+        },
+        "comprehensiveAnalysis": {
+            "type": "string",
+            "title": "🔍 Comprehensive Analysis",
+            "description": "Full dataset with all audit data and AI insights",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=comprehensive"
+        },
+        "screenshots": {
+            "type": "string",
+            "title": "📸 Screenshots",
+            "description": "Captured website screenshots used for AI analysis",
+            "template": "{{links.apiDefaultKeyValueStoreUrl}}/keys"
+        },
+        "rawData": {
+            "type": "string",
+            "title": "📦 Raw Data (JSON)",
+            "description": "Complete dataset in JSON format for programmatic access",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?format=json"
+        }
+    }
+}
