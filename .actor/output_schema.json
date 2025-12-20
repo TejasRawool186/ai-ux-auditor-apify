@@ -4,6 +4,12 @@
     "description": "Complete website audit results including AI-powered UX/UI analysis, performance metrics, accessibility scores, SEO insights, and actionable recommendations.",
     "type": "object",
     "properties": {
+        "dashboard": {
+            "type": "string",
+            "title": "🎨 Interactive Dashboard",
+            "description": "Beautiful HTML dashboard with all audit results visualized",
+            "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/DASHBOARD.html"
+        },
         "overview": {
             "type": "string",
             "title": "📊 Quick Overview",

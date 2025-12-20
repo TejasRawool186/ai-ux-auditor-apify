@@ -4,6 +4,7 @@ import { Actor } from 'apify';
 import { PlaywrightCrawler } from 'crawlee';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateDashboard } from './dashboard-generator.js';
 
 // AI UX Auditor - Users provide their own API keys
 
@@ -179,7 +180,7 @@ async function detectTechnologies(page) {
                 'React', 'Vue', 'Angular', 'jQuery', '$', 'Shopify', 'WordPress',
                 'gtag', 'ga', 'fbq', 'Intercom', 'Zendesk', 'Stripe', 'PayPal'
             ];
-            
+
             globalChecks.forEach(obj => {
                 if (window[obj]) {
                     detectedTech.globalObjects.push(obj);
@@ -200,16 +201,16 @@ async function detectTechnologies(page) {
         });
 
         // Analyze the collected data to identify technologies
-        
+
         // Frontend Frameworks
-        if (techData.globalObjects.includes('React') || 
+        if (techData.globalObjects.includes('React') ||
             techData.scripts.some(src => src.includes('react'))) {
             technologies.frontend_framework = 'React';
-        } else if (techData.globalObjects.includes('Vue') || 
-                   techData.scripts.some(src => src.includes('vue'))) {
+        } else if (techData.globalObjects.includes('Vue') ||
+            techData.scripts.some(src => src.includes('vue'))) {
             technologies.frontend_framework = 'Vue.js';
-        } else if (techData.globalObjects.includes('Angular') || 
-                   techData.scripts.some(src => src.includes('angular'))) {
+        } else if (techData.globalObjects.includes('Angular') ||
+            techData.scripts.some(src => src.includes('angular'))) {
             technologies.frontend_framework = 'Angular';
         }
 
@@ -238,7 +239,7 @@ async function detectTechnologies(page) {
             techData.scripts.some(src => src.includes('googletagmanager'))) {
             technologies.analytics.push('Google Analytics');
         }
-        if (techData.globalObjects.includes('fbq') || 
+        if (techData.globalObjects.includes('fbq') ||
             techData.scripts.some(src => src.includes('facebook.net'))) {
             technologies.analytics.push('Facebook Pixel');
         }
@@ -257,7 +258,7 @@ async function detectTechnologies(page) {
         }
 
         // E-commerce
-        if (techData.globalObjects.includes('Shopify') || 
+        if (techData.globalObjects.includes('Shopify') ||
             techData.scripts.some(src => src.includes('shopify'))) {
             technologies.ecommerce = 'Shopify';
         } else if (techData.scripts.some(src => src.includes('woocommerce'))) {
@@ -265,21 +266,21 @@ async function detectTechnologies(page) {
         }
 
         // Payment Processors
-        if (techData.globalObjects.includes('Stripe') || 
+        if (techData.globalObjects.includes('Stripe') ||
             techData.scripts.some(src => src.includes('stripe'))) {
             technologies.payment_processors.push('Stripe');
         }
-        if (techData.globalObjects.includes('PayPal') || 
+        if (techData.globalObjects.includes('PayPal') ||
             techData.scripts.some(src => src.includes('paypal'))) {
             technologies.payment_processors.push('PayPal');
         }
 
         // Chat Widgets
-        if (techData.globalObjects.includes('Intercom') || 
+        if (techData.globalObjects.includes('Intercom') ||
             techData.scripts.some(src => src.includes('intercom'))) {
             technologies.chat_widgets.push('Intercom');
         }
-        if (techData.globalObjects.includes('Zendesk') || 
+        if (techData.globalObjects.includes('Zendesk') ||
             techData.scripts.some(src => src.includes('zendesk'))) {
             technologies.chat_widgets.push('Zendesk');
         }
@@ -301,7 +302,7 @@ async function detectTechnologies(page) {
         }
 
         // CDN Detection
-        if (techData.scripts.some(src => src.includes('cloudflare')) || 
+        if (techData.scripts.some(src => src.includes('cloudflare')) ||
             techData.stylesheets.some(href => href.includes('cloudflare'))) {
             technologies.cdn = 'Cloudflare';
         } else if (techData.scripts.some(src => src.includes('jsdelivr'))) {
@@ -367,7 +368,7 @@ async function analyzePerformance(page) {
         });
 
         Object.assign(performance, perfData);
-        
+
         // Calculate performance score based on metrics
         let score = 10;
         if (performance.image_count > 50) score -= 2;
@@ -562,7 +563,7 @@ async function analyzeSEO(page) {
         seo.h1_tags = seoData.h1Tags;
         seo.h2_tags = seoData.h2Tags;
         seo.structured_data_present = seoData.structuredData;
-        seo.image_alt_optimization = seoData.totalImages > 0 ? 
+        seo.image_alt_optimization = seoData.totalImages > 0 ?
             Math.round((seoData.imagesWithAlt / seoData.totalImages) * 100) : 100;
 
         // Check for missing meta tags
@@ -609,7 +610,7 @@ async function analyzeContent(page) {
 
             // Count CTA buttons
             const ctaSelectors = [
-                'button', 'a[href*="signup"]', 'a[href*="register"]', 
+                'button', 'a[href*="signup"]', 'a[href*="register"]',
                 'a[href*="buy"]', 'a[href*="purchase"]', '[class*="cta"]',
                 '[class*="button"]', 'input[type="submit"]'
             ];
@@ -644,7 +645,7 @@ async function analyzeContent(page) {
         // Calculate content scores
         content.readability_score = Math.min(10, Math.max(1, Math.round(content.word_count / 100)));
         content.content_structure_score = Math.min(10, content.heading_count + content.paragraph_count);
-        
+
         let score = 5;
         if (content.word_count > 300) score += 2;
         if (content.heading_count > 3) score += 1;
@@ -723,10 +724,10 @@ async function analyzeConversion(page) {
         conversion.trust_signals = conversionData.trustSignals;
         conversion.urgency_elements = conversionData.urgencyElements;
         conversion.friction_points = conversionData.frictionPoints;
-        
+
         conversion.cta_visibility_score = Math.min(10, conversionData.ctaButtons * 2);
         conversion.social_proof_score = Math.min(10, conversionData.trustSignals.length * 2);
-        conversion.form_optimization_score = conversionData.forms > 0 ? 
+        conversion.form_optimization_score = conversionData.forms > 0 ?
             Math.max(1, 10 - conversionData.frictionPoints.length * 2) : 10;
 
         // Calculate overall conversion score
@@ -801,7 +802,7 @@ Output a strict JSON object with this exact structure:
             // Check if it's a rate limit error
             if (error.message?.includes('429') || error.message?.includes('rate limit')) {
                 const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
-                console.log(`⏳ Rate limit hit, waiting ${waitTime/1000}s before retry...`);
+                console.log(`⏳ Rate limit hit, waiting ${waitTime / 1000}s before retry...`);
                 await new Promise(resolve => setTimeout(resolve, waitTime));
             } else {
                 // Non-rate-limit error, don't retry
@@ -858,7 +859,7 @@ await Actor.main(async () => {
 
     // Get actor input
     let input = await Actor.getInput();
-    
+
     // If no input provided (local testing), throw error
     if (!input) {
         throw new Error('No input provided. Please configure the actor with your API key and URLs to analyze.');
@@ -931,7 +932,7 @@ await Actor.main(async () => {
                     waitUntil: 'domcontentloaded',
                     timeout: 30000
                 });
-                
+
                 // Wait a bit more for dynamic content
                 await page.waitForTimeout(2000);
 
@@ -962,22 +963,22 @@ await Actor.main(async () => {
                 // Comprehensive website analysis
                 log.info('🔍 Detecting technologies...');
                 const technologies = await detectTechnologies(page);
-                
+
                 log.info('⚡ Analyzing performance metrics...');
                 const performance = await analyzePerformance(page);
-                
+
                 log.info('♿ Checking accessibility...');
                 const accessibility = await analyzeAccessibility(page);
-                
+
                 log.info('📱 Testing mobile responsiveness...');
                 const mobile = await analyzeMobileResponsiveness(page);
-                
+
                 log.info('🔍 Analyzing SEO elements...');
                 const seo = await analyzeSEO(page);
-                
+
                 log.info('📝 Examining content quality...');
                 const content = await analyzeContent(page);
-                
+
                 log.info('💰 Evaluating conversion optimization...');
                 const conversion = await analyzeConversion(page);
 
@@ -1048,7 +1049,7 @@ await Actor.main(async () => {
                     'Analysis Type': analysisType,
                     'Viewport': viewPort,
                     'AI Provider': aiProvider.type,
-                    
+
                     // Scores
                     '⭐ Overall UX Score': aiResult.score || 0,
                     '⚡ Performance Score': performance.performance_score,
@@ -1057,53 +1058,53 @@ await Actor.main(async () => {
                     '🔍 SEO Score': seo.seo_score,
                     '📝 Content Score': content.content_score,
                     '💰 Conversion Score': conversion.conversion_score,
-                    
+
                     // AI Analysis
                     '📝 AI Summary': aiResult.summary || 'No summary available',
                     '🎨 Color Palette': (aiResult.color_palette || []).join(', '),
                     '⚠️ Design Issues': (aiResult.design_flaws || []).join(' | '),
                     '✅ Positive Aspects': (aiResult.positive_aspects || []).join(' | '),
                     '💡 AI Recommendations': (aiResult.recommendations || []).join(' | '),
-                    
+
                     // Technology
                     '⚛️ Frontend Framework': technologies.frontend_framework || 'Not detected',
                     '🎨 CSS Framework': technologies.css_framework || 'Not detected',
                     '📄 CMS Platform': technologies.cms || 'Not detected',
                     '🛒 E-commerce Platform': technologies.ecommerce || 'Not detected',
                     '📊 Analytics Tools': technologies.analytics.join(', ') || 'None detected',
-                    
+
                     // Performance
                     '🖼️ Image Count': performance.image_count,
                     '🔘 Button Count': performance.button_count,
                     '📝 Form Count': performance.form_count,
                     '📜 Script Count': performance.script_count,
-                    
+
                     // Accessibility
                     '⚠️ Missing Alt Text': accessibility.alt_text_missing,
                     '🚫 WCAG Violations': accessibility.wcag_violations.join(', ') || 'None found',
                     '📋 Form Labels Score': accessibility.form_labels_score,
-                    
+
                     // Mobile
                     '👆 Touch Target Score': mobile.touch_target_compliance,
                     '📱 Viewport Meta Present': mobile.viewport_meta_present ? 'Yes' : 'No',
                     '🍔 Navigation Type': mobile.mobile_navigation_type || 'Standard',
-                    
+
                     // SEO
                     '📄 Meta Title': seo.meta_title || 'Missing',
                     '📝 Meta Description': seo.meta_description || 'Missing',
                     '📰 H1 Tags': seo.h1_tags.join(', ') || 'None found',
                     '🖼️ Image Alt Optimization': `${seo.image_alt_optimization}%`,
-                    
+
                     // Content
                     '📊 Word Count': content.word_count,
                     '📢 CTA Count': content.call_to_action_count,
                     '🏆 Social Proof Elements': content.social_proof_elements.join(', ') || 'None detected',
-                    
+
                     // Conversion
                     '🛡️ Trust Signals': conversion.trust_signals.join(', ') || 'None detected',
                     '⚠️ Friction Points': conversion.friction_points.join(', ') || 'None detected',
                     '🎯 CTA Visibility Score': conversion.cta_visibility_score,
-                    
+
                     // Screenshot
                     '📸 Screenshot URL': screenshotUrl
                 };
@@ -1116,7 +1117,7 @@ await Actor.main(async () => {
                     analysis_type: analysisType,
                     viewport: viewPort,
                     ai_provider: aiProvider.type,
-                    
+
                     // AI Analysis Results
                     overall_score: aiResult.score || 0,
                     ai_summary: aiResult.summary || 'No summary available',
@@ -1124,28 +1125,28 @@ await Actor.main(async () => {
                     design_flaws: aiResult.design_flaws || [],
                     positive_aspects: aiResult.positive_aspects || [],
                     ai_recommendations: aiResult.recommendations || [],
-                    
+
                     // Technology Stack
                     technology_stack: technologies,
-                    
+
                     // Performance Metrics
                     performance_metrics: performance,
-                    
+
                     // Accessibility Analysis
                     accessibility_analysis: accessibility,
-                    
+
                     // Mobile Responsiveness
                     mobile_analysis: mobile,
-                    
+
                     // SEO Analysis
                     seo_analysis: seo,
-                    
+
                     // Content Analysis
                     content_analysis: content,
-                    
+
                     // Conversion Optimization
                     conversion_analysis: conversion,
-                    
+
                     // Comprehensive Scores
                     scores: {
                         overall_ux: aiResult.score || 0,
@@ -1156,7 +1157,7 @@ await Actor.main(async () => {
                         content: content.content_score,
                         conversion: conversion.conversion_score
                     },
-                    
+
                     // Screenshot
                     screenshot_url: screenshotUrl
                 };
@@ -1191,9 +1192,34 @@ await Actor.main(async () => {
 
     // Convert startUrls format for crawler
     const urls = startUrls.map(item => typeof item === 'string' ? item : item.url);
-    
+
     // Run the crawler
     await crawler.run(urls);
+
+    // Generate HTML Dashboard
+    console.log('🎨 Generating interactive HTML dashboard...');
+    try {
+        // Get all results from the dataset
+        const dataset = await Actor.openDataset();
+        const { items: allResults } = await dataset.getData();
+
+        // Generate the dashboard HTML
+        const dashboardHtml = generateDashboard(allResults);
+
+        // Save dashboard to key-value store
+        await Actor.setValue('DASHBOARD.html', dashboardHtml, { contentType: 'text/html' });
+
+        // Get the dashboard URL
+        const keyValueStore = await Actor.openKeyValueStore();
+        const storeId = keyValueStore.id;
+        const dashboardUrl = `https://api.apify.com/v2/key-value-stores/${storeId}/records/DASHBOARD.html`;
+
+        console.log('✅ Dashboard generated successfully!');
+        console.log(`🔗 Dashboard URL: ${dashboardUrl}`);
+    } catch (dashboardError) {
+        console.log(`⚠️ Dashboard generation failed: ${dashboardError.message}`);
+        // Don't throw - dashboard is optional, audit results are already saved
+    }
 
     console.log('✨ AI UI/UX Design Auditor - Completed!');
     console.log(`📊 Analysis completed using your ${aiProvider.type.toUpperCase()} API key`);
