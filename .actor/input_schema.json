@@ -15,7 +15,7 @@
             ]
         },
         "apiKey": {
-            "title": "Your API Key (Required)",
+            "title": "Your API Key (Gemini/OpenAI/OpenRouter)",
             "type": "string",
             "description": "Add your API key: OpenAI (sk-...), OpenRouter (sk-or-...), or Gemini (AIza...). The actor will automatically detect the provider.",
             "editor": "textfield",
