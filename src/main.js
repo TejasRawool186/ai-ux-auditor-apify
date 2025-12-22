@@ -843,7 +843,7 @@ Output a strict JSON object with this exact structure:
 
     // Use the most reliable model
     const model = client.getGenerativeModel({
-        model: 'gemini-1.5-flash-latest'
+        model: 'gemini-2.0-flash'
     });
 
     const result = await model.generateContent([fullPrompt, imagePart]);
